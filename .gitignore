@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+coverage/
+*.tsbuildinfo
+
+# Env & secrets
+.env
+.env.*
+.dev.vars
+*.keystore
+*.jks
+keystore.properties
+
+# Capacitor / Android generated
+native/android/
+native/ios/
+.gradle/
+local.properties
+
+# Logs & OS
+*.log
+.DS_Store
+
+# PM2
+.pm2/
+
+# Archives
+*.tar.gz
+*.zip
