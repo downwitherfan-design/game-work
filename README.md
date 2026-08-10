@@ -32,8 +32,24 @@
 
 ## 🚦 وضعیت پروژه
 
-- **فاز فعلی:** فاز ۰ — قراردادها و اسکلت پروژه
+- **فاز فعلی:** ✅ فاز ۰ تکمیل شد (AI-14) — اسکلت مونوریپو + contracts قفل‌شده با تست ۱۰۰٪ + CI/CD + native/
 - **آخرین به‌روزرسانی:** 2026-08-10
+
+## 🚀 شروع سریع (برای همه‌ی AIها)
+
+```bash
+git clone <repo> && cd <repo>
+npm ci            # نصب قطعی از package-lock (فقط AI-14 حق commit لاک را دارد)
+npm run build     # build همه‌ی workspaceها — باید سبز باشد
+npm test          # تست همه — contracts پوشش ۱۰۰٪
+npm run lint      # ESLint سخت‌گیر (no-any)
+```
+
+- شاخه‌ی کاری: `ai-XX/<feature>` — گارد مالکیت CI فقط مسیرهای خودتان را می‌پذیرد (`tools/check-ownership.mjs`).
+- بودجه‌ی حجم: وب < 2MB gzip، AAB < 30MB (`tools/check-budget.mjs`).
+- وابستگی جدید یا تغییر contracts: فقط با RFC — [`docs/rfcs/TEMPLATE.md`](docs/rfcs/TEMPLATE.md) + [`docs/deps-policy.md`](docs/deps-policy.md).
+- ⚠️ فایل‌های workflow در [`.github/workflows-pending/`](.github/workflows-pending/) هستند — فعال‌سازی یک‌باره‌ی انسانی طبق [`ACTIVATION.md`](.github/workflows-pending/ACTIVATION.md).
+- راهنمای انتشار اندروید: [`native/README.md`](native/README.md)
 
 ## ⚖️ قانون طلایی همکاری
 
