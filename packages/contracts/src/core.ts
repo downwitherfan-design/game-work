@@ -73,7 +73,7 @@ export function normalizeFa(input: string): string {
   let out = input.normalize('NFC');
   out = out.replace(DIACRITICS_RE, '');
   out = out.split('').map((ch) => CHAR_MAP[ch] ?? ch).join('');
-  out = out.replaceAll(ZWNJ, '').replaceAll(ZWJ, '');
+  out = out.split(ZWNJ).join('').split(ZWJ).join('');
   out = out.trim();
   return out;
 }
