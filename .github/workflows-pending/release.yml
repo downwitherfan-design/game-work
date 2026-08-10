@@ -44,6 +44,7 @@ jobs:
           npm ci
           npx cap add android || true
           npx cap sync android
+          node tools/apply-overrides.mjs
 
       - name: Decode keystore from secrets
         working-directory: native
