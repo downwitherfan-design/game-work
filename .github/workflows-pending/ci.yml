@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: ['main', 'ai-**']
+  pull_request:
+    branches: ['main']
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------
+  # گارد مرز مالکیت — مهم‌ترین محافظ موازی‌کاری ۱۵ AI
+  # فایل‌های تغییرکرده در PR باید فقط داخل مسیرهای مالکیت شاخه باشند
+  # ---------------------------------------------------------------
+  ownership:
+    name: 🔒 Ownership guard
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check changed files vs branch ownership
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          BASE="origin/${{ github.base_ref }}"
+          FILES=$(git diff --name-only "$BASE"...HEAD)
+          echo "Branch: $BRANCH"
+          echo "$FILES"
+          # shellcheck disable=SC2086
+          node tools/check-ownership.mjs "$BRANCH" $FILES
+
+  # ---------------------------------------------------------------
+  # بیلد + لینت + تست همه‌ی workspaceها (با گزارش پوشش تست contracts)
+  # ---------------------------------------------------------------
+  build-test:
+    name: 🧪 Build, lint & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install (reproducible)
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Build all workspaces
+        run: npm run build
+      - name: Test all workspaces (contracts requires 100% coverage)
+        run: npm test
+      - name: Upload contracts coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contracts-coverage
+          path: packages/contracts/coverage/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # ---------------------------------------------------------------
+  # بودجه‌ی حجم — «budget as code» (وب < 2MB gzip اولیه)
+  # AAB budget در release.yml سنجیده می‌شود (نیازمند بیلد اندروید)
+  # ---------------------------------------------------------------
+  size-budget:
+    name: 📦 Size budget (web < 2MB gzip)
+    runs-on: ubuntu-latest
+    needs: build-test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install (reproducible)
+        run: npm ci
+      - name: Build app bundle
+        run: npm run build:app
+      - name: Check web bundle budget
+        run: |
+          if [ -d packages/app-shell/dist ] && [ -n "$(ls -A packages/app-shell/dist 2>/dev/null)" ]; then
+            node tools/check-budget.mjs web packages/app-shell/dist
+          else
+            echo "ℹ️ app-shell هنوز خروجی dist ندارد (فاز ۰) — بودجه با اولین باندل فعال می‌شود."
+          fi
