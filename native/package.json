@@ -1,0 +1,24 @@
+{
+  "name": "dordaneh-native",
+  "version": "0.1.0",
+  "private": true,
+  "description": "پوسته‌ی نیتیو اندروید دُردانه — Capacitor 6 (مالک: AI-14)",
+  "scripts": {
+    "cap:add": "cap add android",
+    "cap:sync": "cap sync android",
+    "cap:open": "cap open android",
+    "aab": "cd android && ./gradlew bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "6.1.2",
+    "@capacitor/app": "6.0.1",
+    "@capacitor/core": "6.1.2",
+    "@capacitor/haptics": "6.0.1",
+    "@capacitor/local-notifications": "6.1.0",
+    "@capacitor/preferences": "6.0.2",
+    "@capacitor/share": "6.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "6.1.2"
+  }
+}
