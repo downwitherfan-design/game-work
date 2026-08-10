@@ -1,0 +1,29 @@
+<!--
+  دیپ‌لینک‌های دُردانه — این intent-filter ها باید داخل <activity> اصلی
+  (MainActivity) در AndroidManifest.xml تولیدشده قرار بگیرند.
+  اسکریپت native/tools/apply-overrides.mjs این کار را خودکار انجام می‌دهد.
+  مصرف‌کننده‌ها: AI-07 (viral-share) و AI-10 (duel-mode).
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <activity android:name=".MainActivity">
+
+      <!-- https://dordaneh.ir/d/* (App Links) -->
+      <intent-filter android:autoVerify="true">
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="https" android:host="dordaneh.ir" android:pathPrefix="/d/" />
+      </intent-filter>
+
+      <!-- اسکیم اختصاصی dordaneh:// -->
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="dordaneh" />
+      </intent-filter>
+
+    </activity>
+  </application>
+</manifest>
