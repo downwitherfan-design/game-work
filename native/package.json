@@ -5,7 +5,7 @@
   "description": "پوسته‌ی نیتیو اندروید دُردانه — Capacitor 6 (مالک: AI-14)",
   "scripts": {
     "cap:add": "cap add android",
-    "cap:sync": "cap sync android",
+    "cap:sync": "cap sync android && node tools/apply-overrides.mjs",
     "cap:open": "cap open android",
     "aab": "cd android && ./gradlew bundleRelease"
   },
