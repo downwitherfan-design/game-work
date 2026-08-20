@@ -7,7 +7,10 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "gen:sfx": "vite-node tools/generate-sfx.ts",
+    "demo": "vite demo --open"
   },
   "dependencies": {
     "@dordaneh/contracts": "*"
