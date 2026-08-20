@@ -7,9 +7,14 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --coverage",
+    "test:watch": "vitest"
   },
   "dependencies": {
-    "@dordaneh/contracts": "*"
+    "@dordaneh/contracts": "*",
+    "preact": "10.24.3"
+  },
+  "devDependencies": {
+    "happy-dom": "15.7.4"
   }
 }
