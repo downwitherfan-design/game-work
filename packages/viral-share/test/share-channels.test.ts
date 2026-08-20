@@ -1,9 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import {
-  shareImageWithFallback,
-  shareTextWithFallback,
-  type ShareEnv,
-} from '../src/share-channels';
+import { shareImageWithFallback, shareTextWithFallback } from '../src/share-channels';
 
 const TEXT = 'دُردانه 💎 #۸۱۲ — ۴/۶';
 const TITLE = 'نتیجه‌ی دُردانه‌ی من';

@@ -80,8 +80,9 @@ describe('renderCultureCard — snapshot رندر canvas', () => {
 
   it('توضیح اختیاری: بدون explanation هم رندر می‌شود', async () => {
     const canvas = createRecordingCanvas(1080, 1080);
-    const { explanation: _omit, ...rest } = sampleCard;
-    await renderCultureCard({ ...rest }, 'post', () => canvas, STRINGS);
+    const rest = { ...sampleCard };
+    delete rest.explanation;
+    await renderCultureCard(rest, 'post', () => canvas, STRINGS);
     expect(canvas.texts).toContain(rest.title);
   });
 
