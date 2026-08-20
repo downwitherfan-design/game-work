@@ -17,7 +17,7 @@ import { createMemoryStorage } from '@dordaneh/contracts';
 import { AudioEngine, type EngineOptions } from './engine';
 import { createHaptics, type HapticsDriver, type GlobalLike } from './haptics';
 import { SettingsStore } from './settings';
-import { arpeggioFreq, ARPEGGIO_DEGREES, BRAND_ROOT, streakLayersFor } from './sfx-defs';
+import { ARPEGGIO_DEGREES, BRAND_ROOT } from './sfx-defs';
 import { shurFreq } from './dsp';
 
 export interface CreateAudioOptions {

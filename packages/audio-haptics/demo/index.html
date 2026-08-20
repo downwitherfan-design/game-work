@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>دُردانه — دموی صدا و هپتیک (AI-13)</title>
+  <style>
+    /* دمو داخلی توسعه — خارج از باندل اپ؛ توکن‌های ui-kit اینجا الزامی نیست
+       اما برای هم‌خوانی بصری از همان پالت مسترپلن استفاده می‌کنیم. */
+    :root {
+      --dor-bg: #f7f3e9; --dor-correct: #4caf7d; --dor-present: #e5a83b;
+      --dor-absent: #b7b0a3; --dor-accent: #1ca9a6; --dor-gold: #d4af37;
+      --dor-dark-bg: #1b2430; --dor-radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px; background: var(--dor-bg);
+      font-family: Vazirmatn, Tahoma, sans-serif; color: #333;
+      max-inline-size: 720px; margin-inline: auto;
+    }
+    h1 { color: var(--dor-dark-bg); font-size: 1.5rem; }
+    h2 { font-size: 1.05rem; margin-block: 20px 8px; color: #555; }
+    .hint {
+      background: #fff8e6; border: 1px solid var(--dor-present);
+      border-radius: var(--dor-radius); padding: 10px 14px; font-size: 0.9rem;
+    }
+    .grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    button {
+      font-family: inherit; font-size: 0.95rem; cursor: pointer;
+      border: none; border-radius: var(--dor-radius); padding: 10px 16px;
+      background: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+      transition: transform 0.06s;
+    }
+    button:active { transform: scale(0.96); }
+    button.sfx { border-inline-start: 4px solid var(--dor-accent); }
+    button.hap { border-inline-start: 4px solid var(--dor-present); }
+    button.arp { border-inline-start: 4px solid var(--dor-correct); }
+    button.jingle { border-inline-start: 4px solid var(--dor-gold); }
+    label.switch { display: inline-flex; align-items: center; gap: 8px; margin-inline-end: 20px; }
+    #status { margin-block-start: 16px; font-size: 0.85rem; color: #777; min-block-size: 1.2em; }
+    code { background: #eee9dc; padding: 1px 5px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎵 دُردانه — دموی صدا و هپتیک</h1>
+    <p class="hint">
+      این دمو مستقیماً از سورس پکیج اجرا می‌شود. از ریشه‌ی مونوریپو:
+      <code>npx vite packages/audio-haptics/demo</code>
+      — اولین کلیک روی هر دکمه، AudioContext را unlock می‌کند (سیاست autoplay).
+    </p>
+  </header>
+
+  <main>
+    <section id="sfx-section">
+      <h2>هر ۱۰ SFX قرارداد (§9)</h2>
+      <div class="grid" id="sfx-grid"></div>
+    </section>
+
+    <section id="arpeggio-section">
+      <h2>هارمونی ردیف حدس — آرپژ شور (کاشی ۱ تا ۶)</h2>
+      <div class="grid" id="arp-grid"></div>
+    </section>
+
+    <section id="jingle-section">
+      <h2>لایت‌موتیف استریک (جینگل پیروزی لایه‌دار)</h2>
+      <div class="grid" id="jingle-grid"></div>
+    </section>
+
+    <section id="haptic-section">
+      <h2>هپتیک (روی موبایل تست کنید)</h2>
+      <div class="grid" id="hap-grid"></div>
+    </section>
+
+    <section id="settings-section">
+      <h2>تنظیمات (ماندگار در localStorage)</h2>
+      <label class="switch"><input type="checkbox" id="sfx-toggle" checked /> صدای افکت‌ها</label>
+      <label class="switch"><input type="checkbox" id="music-toggle" /> موسیقی سنتور (پیش‌فرض خاموش — هنگام win به‌طور خودکار duck می‌شود)</label>
+    </section>
+  </main>
+
+  <footer><p id="status"></p></footer>
+
+  <script type="module">
+    import { createAudio, ALL_SFX } from '../src/index.ts';
+    import { createWebStorage } from '@dordaneh/contracts';
+
+    const audio = createAudio({ storage: createWebStorage(localStorage) });
+    const status = document.getElementById('status');
+    const say = (m) => { status.textContent = m; };
+
+    // unlock روی اولین ژست (الزام autoplay)
+    addEventListener('pointerdown', () => audio.unlock(), { once: true });
+
+    const mk = (parent, cls, label, fn) => {
+      const b = document.createElement('button');
+      b.className = cls; b.textContent = label;
+      b.addEventListener('click', () => { audio.unlock(); fn(); });
+      document.getElementById(parent).appendChild(b);
+    };
+
+    for (const name of ALL_SFX) {
+      mk('sfx-grid', 'sfx', name, () => { audio.play(name); say(`play('${name}')`); });
+    }
+    for (let i = 0; i < 6; i++) {
+      mk('arp-grid', 'arp', `کاشی ${i + 1}`, () => { audio.playTileNote(i); say(`playTileNote(${i})`); });
+    }
+    for (const [label, days] of [['عادی', 0], ['۷ روز', 7], ['۳۰ روز', 30], ['۱۰۰ روز', 100]]) {
+      mk('jingle-grid', 'jingle', `پیروزی ${label}`, () => {
+        audio.setStreakDays(days); audio.play('win'); say(`win jingle — streak ${days}`);
+      });
+    }
+    for (const kind of ['light', 'medium', 'success', 'error']) {
+      mk('hap-grid', 'hap', kind, () => { audio.haptic(kind); say(`haptic('${kind}')`); });
+    }
+
+    const sfxT = document.getElementById('sfx-toggle');
+    const musT = document.getElementById('music-toggle');
+    sfxT.checked = audio.isSfxEnabled();
+    musT.checked = audio.isMusicEnabled();
+    sfxT.addEventListener('change', () => { audio.unlock(); audio.setSfxEnabled(sfxT.checked); });
+    musT.addEventListener('change', () => { audio.unlock(); audio.setMusicEnabled(musT.checked); });
+  </script>
+</body>
+</html>
