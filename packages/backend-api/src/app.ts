@@ -285,7 +285,8 @@ export function createApp(): Hono<{ Bindings: Env }> {
     if (!(await checkRateLimit(c.env.DB, anonId, 'duel_result', Date.now())))
       return c.json(err(ERR.RATE_LIMITED), 429);
 
-    const name = sanitizeName(body['name'], anonId);
+    // اگر name ارسال نشده، '' می‌فرستیم تا نام قبلی بازیکن (مثلاً سازنده) حفظ شود
+    const name = typeof body['name'] === 'string' ? sanitizeName(body['name'], anonId) : '';
     const outcome = await submitDuelResult(
       c.env.DB,
       duelId,

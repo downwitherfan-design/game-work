@@ -66,7 +66,8 @@ CREATE TABLE IF NOT EXISTS duel_results (
   duel_id     TEXT    NOT NULL,
   anon_id     TEXT    NOT NULL,
   name        TEXT    NOT NULL DEFAULT '',
-  guess_count INTEGER NOT NULL CHECK (guess_count BETWEEN 1 AND 6),
+  -- 0 = هنوز بازی نکرده (placeholder سازنده)؛ 1..6 = نتیجه‌ی ثبت‌شده
+  guess_count INTEGER NOT NULL CHECK (guess_count BETWEEN 0 AND 6),
   duration_ms INTEGER NOT NULL CHECK (duration_ms >= 0),
   created_at  INTEGER NOT NULL,
   PRIMARY KEY (duel_id, anon_id),
