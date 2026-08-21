@@ -1,0 +1,22 @@
+# ⚙️ پیکربندی Cloudflare Workers برای @dordaneh/backend-api (مالک: AI-09)
+# اجرای لوکال:   npm run dev -w @dordaneh/backend-api   (wrangler dev --local)
+# مهاجرت لوکال:  npm run db:migrate:local -w @dordaneh/backend-api
+name = "dordaneh-api"
+main = "src/worker.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# مبنای لینک دعوت (حلقه/دوئل) — AI-07 دیپ‌لینک نهایی را روی همین مسیرها می‌سازد
+INVITE_BASE_URL = "https://dordaneh.app"
+# دامنه‌های مجاز CORS (جدا با کاما). localhost همیشه مجاز است.
+ALLOWED_ORIGINS = "https://dordaneh.app,https://www.dordaneh.app"
+# ADMIN_TOKEN فقط secret: `wrangler secret put ADMIN_TOKEN` یا .dev.vars (gitignored)
+
+# D1 — تنها دیتابیس پروژه. لوکال: SQLite خودکار در .wrangler/ (کامیت نمی‌شود).
+# برای پروداکشن: `wrangler d1 create dordaneh-production` و جایگزینی database_id.
+[[d1_databases]]
+binding = "DB"
+database_name = "dordaneh-production"
+database_id = "REPLACE_WITH_PRODUCTION_ID"
+migrations_dir = "migrations"
