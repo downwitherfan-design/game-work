@@ -7,7 +7,8 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "npm run validate && vitest run --coverage",
+    "validate": "vitest run --no-coverage test/validate.test.ts"
   },
   "dependencies": {
     "@dordaneh/contracts": "*"
