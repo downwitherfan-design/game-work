@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>دُردانه — نمایشگاه دیزاین‌سیستم (ui-kit)</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E💎%3C/text%3E%3C/svg%3E" />
+<!-- سند زنده‌ی دیزاین‌سیستم برای ۱۴ AI دیگر. اجرا: npx vite demo از ریشه‌ی پکیج، یا از ریشه‌ی ریپو: npx vite packages/ui-kit/demo -->
+<link rel="stylesheet" href="../src/tokens.css" />
+<link rel="stylesheet" href="../src/ui-kit.css" />
+<style>
+  body {
+    margin: 0;
+    background: var(--dor-bg);
+    color: var(--dor-ink);
+    font-family: var(--dor-font);
+    transition: background 200ms ease;
+  }
+  main#gallery { max-inline-size: 720px; margin-inline: auto; padding: var(--dor-space-4); }
+  section.demo-section {
+    background: var(--dor-surface);
+    border: 1px solid var(--dor-border);
+    border-radius: var(--dor-radius);
+    padding: var(--dor-space-4);
+    margin-block-end: var(--dor-space-4);
+  }
+  section.demo-section > h2 { margin-block-start: 0; font-size: 1.05rem; }
+  .demo-row { display: flex; flex-wrap: wrap; gap: var(--dor-space-2); align-items: center; }
+  .demo-note { font-size: 0.8rem; color: var(--dor-ink-soft); }
+  header#controls {
+    position: sticky; inset-block-start: 0; z-index: 10;
+    background: var(--dor-surface); border-block-end: 1px solid var(--dor-border);
+    padding: var(--dor-space-2) var(--dor-space-3);
+    display: flex; gap: var(--dor-space-3); flex-wrap: wrap; align-items: center;
+  }
+  .demo-swatch { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; font-size: 0.7rem; }
+  .demo-swatch i { inline-size: 44px; block-size: 44px; border-radius: var(--dor-radius); border: 1px solid var(--dor-border); }
+</style>
+</head>
+<body>
+<header id="controls">
+  <strong>💎 دُردانه — دیزاین‌سیستم</strong>
+  <span id="theme-switch-slot"></span>
+  <span id="cb-switch-slot"></span>
+</header>
+<main id="gallery"></main>
+
+<script type="module">
+import { h, render } from 'preact';
+import {
+  Button, Tile, Modal, Card, Toast, Switch, TopBar, BottomNav, ProgressRing, Confetti,
+} from '../src/index.ts';
+
+const state = {
+  dark: false,
+  colorblind: false,
+  modalOpen: false,
+  toastOpen: false,
+  switchOn: true,
+  confetti: false,
+  nav: 'daily',
+  progress: 0.68,
+};
+
+function applyFlags() {
+  document.documentElement.dataset.theme = state.dark ? 'dark' : '';
+  document.documentElement.dataset.colorblind = state.colorblind ? 'true' : '';
+}
+
+function Section(title, note, ...children) {
+  return h('section', { class: 'demo-section' }, [
+    h('h2', null, title),
+    note ? h('p', { class: 'demo-note' }, note) : null,
+    h('div', { class: 'demo-row' }, children),
+  ]);
+}
+
+function App() {
+  const tiles = [
+    { l: 'د', s: 'correct' }, { l: 'ر', s: 'present' }, { l: 'خ', s: 'absent' },
+    { l: 'ش', s: 'correct' }, { l: 'ا', s: 'present' }, { l: 'ن', s: 'absent' },
+  ];
+  return h('div', null, [
+    Section('Button — دکمه', 'واریانت‌ها + میکرو-انیمیشن «نفس» CTA',
+      h(Button, { variant: 'primary', breath: true, onClick: () => { state.confetti = true; rerender(); } }, 'شروع بازی 🎉'),
+      h(Button, { variant: 'secondary' }, 'ثانویه'),
+      h(Button, { variant: 'ghost' }, 'شبح'),
+      h(Button, { variant: 'danger' }, 'خطر'),
+      h(Button, { variant: 'gold' }, 'طلایی'),
+      h(Button, { variant: 'primary', disabled: true }, 'غیرفعال'),
+    ),
+    Section('Tile — خانه‌ی حروف', 'flip پلکانی 250ms + pop تایپ + الگوی کوررنگی (●/─)',
+      ...tiles.map((t, i) => h(Tile, { letter: t.l, variant: t.s, flipDelayMs: i * 250 })),
+      h(Tile, { letter: 'ه', variant: 'tbd' }),
+      h(Tile, { variant: 'empty' }),
+    ),
+    Section('Card — کارت فرهنگی', 'قاب طلایی legendary + بافت کاغذی SVG',
+      h(Card, { variant: 'common', title: 'ضرب‌المثل روز', body: 'هر که بامش بیش، برفش بیشتر.', source: 'امثال و حکم دهخدا' }),
+      h(Card, { variant: 'rare', title: 'شعر روز', body: 'بنی‌آدم اعضای یکدیگرند / که در آفرینش ز یک گوهرند', source: 'گلستان سعدی، باب اول' }),
+      h(Card, { variant: 'legendary', title: 'دانستنی', body: 'واژه‌ی «دُردانه» یعنی دانه‌ی مروارید — کنایه از هر چیز یگانه و گران‌بها.', source: 'لغت‌نامه دهخدا' }),
+    ),
+    Section('Toast — پیام', '',
+      h(Button, { variant: 'secondary', onClick: () => { state.toastOpen = true; rerender(); setTimeout(() => { state.toastOpen = false; rerender(); }, 2200); } }, 'نمایش توست'),
+      state.toastOpen ? h(Toast, { message: 'آفرین! زدی وسط خال 🎯', variant: 'success' }) : null,
+    ),
+    Section('Switch — کلید', '',
+      h(Switch, { checked: state.switchOn, label: 'صدا', onChange: (v) => { state.switchOn = v; rerender(); } }),
+    ),
+    Section('Modal — دیالوگ', '',
+      h(Button, { variant: 'primary', onClick: () => { state.modalOpen = true; rerender(); } }, 'باز کردن مودال'),
+      h(Modal, { open: state.modalOpen, title: 'آمار شما', onClose: () => { state.modalOpen = false; rerender(); } },
+        h('p', null, 'استریک فعلی: ۱۲ روز 🔥'),
+        h(Button, { variant: 'primary', onClick: () => { state.modalOpen = false; rerender(); } }, 'باشه'),
+      ),
+    ),
+    Section('ProgressRing — حلقه‌ی پیشرفت', 'اعداد فارسی (خط قرمز ۳۱)',
+      h(ProgressRing, { value: state.progress }),
+      h(ProgressRing, { value: 1, variant: 'gold' }),
+      h(ProgressRing, { value: 0.25, size: 48, showLabel: false }),
+    ),
+    Section('TopBar / BottomNav — ناوبری', '',
+      h('div', { style: 'inline-size:100%; border:1px solid var(--dor-border); border-radius: var(--dor-radius); overflow:hidden;' }, [
+        h(TopBar, {
+          title: 'دُردانه',
+          start: h(Button, { variant: 'ghost', ariaLabel: 'تنظیمات' }, '⚙️'),
+          end: h(Button, { variant: 'ghost', ariaLabel: 'راهنما' }, '❓'),
+        }),
+        h('div', { style: 'block-size:40px' }),
+        h(BottomNav, {
+          items: [
+            { id: 'daily', label: 'روزانه', icon: '🎯' },
+            { id: 'practice', label: 'تمرین', icon: '♾️' },
+            { id: 'album', label: 'گنجینه', icon: '💎' },
+            { id: 'stats', label: 'آمار', icon: '📊' },
+          ],
+          activeId: state.nav,
+          onSelect: (id) => { state.nav = id; rerender(); },
+        }),
+      ]),
+    ),
+    Section('توکن‌های رنگ', 'در هر ۴ حالت (تم × کوررنگی) WCAG AA تست خودکار دارد',
+      ...['--dor-correct', '--dor-present', '--dor-absent', '--dor-accent', '--dor-gold', '--dor-bg', '--dor-surface'].map((v) =>
+        h('span', { class: 'demo-swatch' }, [h('i', { style: `background: var(${v})` }), h('span', null, v)]),
+      ),
+    ),
+    state.confetti ? h(Confetti, { active: true, onDone: () => { state.confetti = false; rerender(); } }) : null,
+  ]);
+}
+
+function Controls() {
+  return h('span', { class: 'demo-row' }, [
+    h(Switch, { checked: state.dark, label: 'تم تیره', onChange: (v) => { state.dark = v; applyFlags(); rerender(); } }),
+    h(Switch, { checked: state.colorblind, label: 'حالت کوررنگی', onChange: (v) => { state.colorblind = v; applyFlags(); rerender(); } }),
+  ]);
+}
+
+function rerender() {
+  render(h(App), document.getElementById('gallery'));
+  render(h(Controls), document.getElementById('theme-switch-slot'));
+}
+applyFlags();
+rerender();
+</script>
+</body>
+</html>

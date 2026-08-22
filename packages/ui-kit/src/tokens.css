@@ -1,0 +1,129 @@
+/**
+ * @dordaneh/ui-kit — توکن‌های طراحی (مالک: AI-04)
+ * منبع واحد رنگ/فونت/فاصله طبق docs/02_CONTRACTS.md §4 — استفاده در همه‌ی UIها اجباری.
+ * پالت «کاغذی روشن» + تم تیره [data-theme="dark"] + حالت کوررنگی [data-colorblind="true"].
+ */
+
+/* ---------- فونت Vazirmatn (subset فارسی + لاتین محدود، آفلاین-اول، بدون CDN) ---------- */
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/Vazirmatn-Regular-sub.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/Vazirmatn-Bold-sub.woff2') format('woff2');
+}
+
+/* ---------- توکن‌های قرارداد (مقادیر دقیق §4 — تغییر فقط با RFC) ---------- */
+:root {
+  --dor-bg: #f7f3e9;
+  --dor-correct: #4caf7d;
+  --dor-present: #e5a83b;
+  --dor-absent: #b7b0a3;
+  --dor-accent: #1ca9a6;
+  --dor-gold: #d4af37;
+  --dor-dark-bg: #1b2430;
+  --dor-dark-accent: #0e6e6b;
+  --dor-font: 'Vazirmatn', sans-serif;
+  --dor-radius: 12px;
+  --dor-space-1: 4px;
+  --dor-space-2: 8px;
+  --dor-space-3: 16px;
+  --dor-space-4: 24px;
+
+  /* ---------- توکن‌های مشتق‌شده (سطح معنایی — ui-kit) ---------- */
+  --dor-ink: #1b2430; /* متن اصلی روی پس‌زمینه‌ی کاغذی (کنتراست ~14:1) */
+  --dor-ink-soft: #4c5462; /* متن ثانویه (کنتراست ≥ 4.5:1 روی --dor-bg) */
+  --dor-surface: #fffdf6; /* سطح کارت/مودال */
+  --dor-surface-2: #efe9da; /* سطح فرورفته (سوییچ خاموش، پس‌زمینه‌ی progress) */
+  --dor-border: #d9d2c2; /* خطوط ظریف */
+  --dor-tile-empty-border: #c9c1b0;
+
+  /* متن روی خانه‌های رنگی — جوهر تیره روی هر سه رنگ AA را رد می‌کند */
+  --dor-on-correct: #1b2430;
+  --dor-on-present: #1b2430;
+  --dor-on-absent: #1b2430;
+
+  /* دکمه‌ی اصلی: تِیل تیره + متن سفید (کنتراست ~6:1، AA normal) */
+  --dor-btn-bg: var(--dor-dark-accent);
+  --dor-btn-fg: #ffffff;
+  --dor-btn-secondary-fg: #0b5a58; /* متن دکمه‌ی ثانویه روی کاغذ (AA) */
+
+  --dor-danger: #b3403a; /* خطا/باخت (AA روی کاغذ با متن سفید) */
+  --dor-on-danger: #ffffff;
+  --dor-on-gold: #1b2430;
+
+  --dor-shadow-1: 0 1px 3px rgba(27, 36, 48, 0.1);
+  --dor-shadow-2: 0 6px 20px rgba(27, 36, 48, 0.14);
+  --dor-focus-ring: 0 0 0 3px rgba(28, 169, 166, 0.45);
+
+  /* حالت کوررنگی: پیش‌فرض = همان رنگ‌های استاندارد */
+  --dor-cb: 0; /* فلگ تشخیصی برای تست/دیباگ */
+  --dor-cb-correct: var(--dor-correct);
+  --dor-cb-present: var(--dor-present);
+
+  /* ناحیه‌ی لمس (Apple HIG / قانون فیتس) */
+  --dor-touch-min: 44px;
+
+  /* زمان‌بندی انیمیشن */
+  --dor-anim-pop: 110ms;
+  --dor-anim-flip: 500ms;
+  --dor-anim-stagger: 250ms;
+
+  color-scheme: light;
+}
+
+/* ---------- تم تیره ---------- */
+[data-theme='dark'] {
+  --dor-bg: var(--dor-dark-bg);
+  --dor-ink: #f1eadb;
+  --dor-ink-soft: #b6bdc9;
+  --dor-surface: #232e3d;
+  --dor-surface-2: #2c3949;
+  --dor-border: #3a4759;
+  --dor-tile-empty-border: #465364;
+
+  /* در تم تیره دکمه‌ی اصلی = فیروزه‌ای روشن + جوهر تیره (AA) */
+  --dor-btn-bg: var(--dor-accent);
+  --dor-btn-fg: #10201f;
+  --dor-btn-secondary-fg: #6fd3d0;
+
+  --dor-danger: #e2726c;
+  --dor-on-danger: #2a100e;
+
+  --dor-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --dor-shadow-2: 0 6px 20px rgba(0, 0, 0, 0.5);
+  --dor-focus-ring: 0 0 0 3px rgba(28, 169, 166, 0.6);
+
+  color-scheme: dark;
+}
+
+/* ---------- حالت کوررنگی (~۸٪ مردان — Birch 2001؛ الگوی Wordle) ----------
+ * سبز/کهربایی → آبی/نارنجیِ متمایز + الگوی شکل روی Tile (نقطه/خط در ui-kit.css)
+ */
+[data-colorblind='true'] {
+  --dor-cb: 1;
+  --dor-cb-correct: #1e5fc2; /* آبی — متن سفید AA (~6:1) */
+  --dor-cb-present: #e07a2e; /* نارنجی — جوهر تیره AA (~5:1) */
+  --dor-correct: var(--dor-cb-correct);
+  --dor-present: var(--dor-cb-present);
+  --dor-on-correct: #ffffff;
+  --dor-on-present: #1b2430;
+}
+
+[data-theme='dark'][data-colorblind='true'] {
+  --dor-on-present: #1b2430;
+}
+
+/* ---------- پایه ---------- */
+.dor-root,
+[data-dor] {
+  font-family: var(--dor-font);
+  direction: rtl;
+}
