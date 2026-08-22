@@ -7,7 +7,7 @@ export default defineConfig({
       provider: 'v8',
       include: ['src/**/*.ts'],
       // UI (tsx) با تست‌های E2E پوشش داده می‌شود (qa/ — AI-15)؛ منطق در ts خالص است
-      exclude: ['src/**/*.d.ts', 'src/index.ts'],
+      exclude: ['src/**/*.d.ts', 'src/index.ts', 'src/types.ts'],
       thresholds: {
         lines: 80,
         functions: 80,
