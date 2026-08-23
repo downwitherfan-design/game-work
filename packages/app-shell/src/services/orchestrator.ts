@@ -96,11 +96,14 @@ export function createOrchestrator(
       const steps: PostSolveStep[] = [];
       if (e.won) {
         // کارت فرهنگی (culture-cards مالک UI/محتواست؛ ما فقط ترتیب می‌چینیم)
-        const state = services.engine.getState(e.puzzleId);
-        const card = services.culture.getCardForPuzzle(
-          puzzleNumberFromId(e.puzzleId),
-          state.solution ?? '',
-        );
+        // موتور واقعی برای puzzleId ثبت‌نشده EngineError('UNKNOWN_PUZZLE') پرتاب می‌کند — تنزل بی‌صدا
+        let solution = '';
+        try {
+          solution = services.engine.getState(e.puzzleId).solution ?? '';
+        } catch {
+          /* ارکستراسیون نباید با رویداد ناشناس بشکند (آفلاین-اول، تنزل محترمانه) */
+        }
+        const card = services.culture.getCardForPuzzle(puzzleNumberFromId(e.puzzleId), solution);
         steps.push({ step: 'culture_card', card });
 
         // آلبوم: ثبت کشف + بج زایگارنیک
@@ -136,9 +139,14 @@ export function createOrchestrator(
     getResumableSession(): ActiveSession | null {
       const s = storage.get<ActiveSession | null>(SHELL_KEYS.session);
       if (!s || typeof s.puzzleId !== 'string') return null;
-      // فقط اگر واقعاً هنوز در حال بازی است
-      const st = services.engine.getState(s.puzzleId);
-      return st.status === 'playing' && st.guesses.length > 0 ? s : null;
+      // فقط اگر واقعاً هنوز در حال بازی است؛ موتور واقعی پس از reload برای
+      // puzzleId ثبت‌نشده UNKNOWN_PUZZLE پرتاب می‌کند → جلسه قابل بازیابی نیست
+      try {
+        const st = services.engine.getState(s.puzzleId);
+        return st.status === 'playing' && st.guesses.length > 0 ? s : null;
+      } catch {
+        return null;
+      }
     },
     hasAlbumBadge(): boolean {
       return storage.get<boolean>(SHELL_KEYS.albumBadge) === true;

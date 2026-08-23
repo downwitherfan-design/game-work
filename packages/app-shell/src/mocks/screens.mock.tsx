@@ -68,7 +68,14 @@ export function MockGameScreen(props: MockGameScreenProps): JSX.Element {
   function submit(e: Event): void {
     e.preventDefault();
     ensureStarted();
-    const res = services.engine.evaluateGuess(puzzleId, input);
+    // موتور واقعی پس از پایان بازی EngineError('GAME_OVER') پرتاب می‌کند — تنزل بی‌صدا
+    let res: ReturnType<typeof services.engine.evaluateGuess>;
+    try {
+      res = services.engine.evaluateGuess(puzzleId, input);
+    } catch {
+      setState(services.engine.getState(puzzleId));
+      return;
+    }
     if ('error' in res) return;
     setInput('');
     const next = services.engine.getState(puzzleId);
