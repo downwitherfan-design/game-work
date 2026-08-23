@@ -25,17 +25,39 @@ describe('getBus — singleton', () => {
   });
 });
 
-describe('createServices — سوییچ mock', () => {
-  it('با پکیج‌های خالی، همه mock هستند', () => {
+describe('createServices — سوییچ mock خودکار', () => {
+  it('موتور (AI-01) و صدا (AI-13) واقعی‌اند؛ بقیه هنوز mock قراردادی', () => {
     const { services } = setup();
     expect(services.mockFlags).toEqual({
-      engine: true,
+      engine: false, // @dordaneh/core-engine واقعی — createEngine({ wordDb })
+      wordDb: true, // @dordaneh/word-db هنوز خالی → mock تزریق می‌شود
       culture: true,
-      audio: true,
+      audio: false, // @dordaneh/audio-haptics واقعی — createAudio({ storage })
       analytics: true,
       monetization: true,
       share: true,
     });
+  });
+
+  it('موتور واقعی با wordDb تزریقی کار می‌کند: آنبوردینگ و روزانه و تمرین', () => {
+    const { services } = setup();
+    const ob = services.engine.getOnboardingPuzzle();
+    expect(ob.puzzleId).toBeTruthy();
+    expect(ob.wordLength).toBeGreaterThan(0);
+    const daily = services.engine.getDailyPuzzle(3);
+    expect(daily.wordLength).toBe(6);
+    const practice = services.engine.getPracticePuzzle(2, 5);
+    expect(practice.puzzleId.startsWith('practice-')).toBe(true);
+  });
+
+  it('موتور واقعی پس از پایان بازی پرتاب می‌کند — پوسته باید گارد داشته باشد', () => {
+    const { services } = setup();
+    const { puzzleId } = services.engine.getOnboardingPuzzle();
+    const res = services.engine.evaluateGuess(puzzleId, 'دردانه');
+    expect('error' in res).toBe(false);
+    expect(services.engine.getState(puzzleId).status).toBe('won');
+    // حدس پس از برد → موتور واقعی EngineError(GAME_OVER) پرتاب می‌کند
+    expect(() => services.engine.evaluateGuess(puzzleId, 'دردانه')).toThrow();
   });
 });
 
@@ -148,6 +170,13 @@ describe('Orchestrator — بازیابی جلسه', () => {
     bus.emit({ type: 'puzzle_started', puzzleId, mode: 'daily' });
     bus.emit({ type: 'puzzle_finished', puzzleId, won: true, guessCount: 2, durationMs: 5 });
     expect(storage.get(SHELL_KEYS.session)).toBeNull();
+    expect(orch.getResumableSession()).toBeNull();
+  });
+
+  it('جلسه با puzzleId ثبت‌نشده در موتور (مثلاً پس از reload) بی‌صدا null می‌شود', () => {
+    const { bus, orch } = setup();
+    // موتور واقعی برای این id ثبتی ندارد → getState پرتاب می‌کند → گارد ما null برمی‌گرداند
+    bus.emit({ type: 'puzzle_started', puzzleId: 'daily-999', mode: 'daily' });
     expect(orch.getResumableSession()).toBeNull();
   });
 });
