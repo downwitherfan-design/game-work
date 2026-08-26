@@ -1,0 +1,15 @@
+{
+  "uiKit.modal.close": "بستن",
+  "uiKit.tile.state.empty": "خالی",
+  "uiKit.tile.state.tbd": "در حال تایپ",
+  "uiKit.tile.state.correct": "درست",
+  "uiKit.tile.state.present": "جای دیگر",
+  "uiKit.tile.state.absent": "نیست",
+  "uiKit.card.rarity.common": "معمولی",
+  "uiKit.card.rarity.rare": "کمیاب",
+  "uiKit.card.rarity.legendary": "دُردانه",
+  "uiKit.card.sourcePrefix": "منبع: {source}",
+  "uiKit.progress.label": "{percent}٪",
+  "uiKit.switch.on": "روشن",
+  "uiKit.switch.off": "خاموش"
+}
