@@ -1,0 +1,18 @@
+{
+  "gameBoard.submit": "ثبت حدس",
+  "gameBoard.invalidWord": "این کلمه در واژه‌نامه نیست",
+  "gameBoard.wrongLength": "کلمه باید {length} حرفی باشد",
+  "gameBoard.win": "آفرین! زدی وسط خال 🎯",
+  "gameBoard.lose": "جواب: {solution} — فردا دوباره!",
+  "appShell.dailyTab": "معمای روز",
+  "appShell.practiceTab": "تمرین",
+  "appShell.statsTab": "آمار",
+  "appShell.albumTab": "گنجینه",
+  "appShell.settings": "تنظیمات",
+  "metaRetention.streak": "استریک: {value} روز",
+  "metaRetention.streakFrozen": "استریکت با یخ‌بند حفظ شد ❄️",
+  "viralShare.copy": "کپی نتیجه",
+  "viralShare.copied": "کپی شد!",
+  "monetization.golden": "نسخه‌ی طلایی",
+  "uiKit.close": "بستن"
+}

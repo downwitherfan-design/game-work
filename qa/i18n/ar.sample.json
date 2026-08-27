@@ -1,0 +1,18 @@
+{
+  "gameBoard.submit": "TODO: ثبت حدس",
+  "gameBoard.invalidWord": "TODO: این کلمه در واژه‌نامه نیست",
+  "gameBoard.wrongLength": "TODO: کلمه باید {length} حرفی باشد",
+  "gameBoard.win": "TODO: آفرین! زدی وسط خال 🎯",
+  "gameBoard.lose": "TODO: جواب: {solution} — فردا دوباره!",
+  "appShell.dailyTab": "TODO: معمای روز",
+  "appShell.practiceTab": "TODO: تمرین",
+  "appShell.statsTab": "TODO: آمار",
+  "appShell.albumTab": "TODO: گنجینه",
+  "appShell.settings": "TODO: تنظیمات",
+  "metaRetention.streak": "TODO: استریک: {value} روز",
+  "metaRetention.streakFrozen": "TODO: استریکت با یخ‌بند حفظ شد ❄️",
+  "viralShare.copy": "TODO: کپی نتیجه",
+  "viralShare.copied": "TODO: کپی شد!",
+  "monetization.golden": "TODO: نسخه‌ی طلایی",
+  "uiKit.close": "TODO: بستن"
+}

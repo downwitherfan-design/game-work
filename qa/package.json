@@ -7,7 +7,12 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run",
+    "test:contract": "vitest run contract-tests",
+    "test:e2e": "playwright test --config e2e/playwright.config.ts",
+    "i18n:lint": "node tools/i18n-lint.mjs",
+    "i18n:lint:strict": "node tools/i18n-lint.mjs --strict",
+    "i18n:skeleton": "node tools/i18n-skeleton.mjs --pseudo"
   },
   "dependencies": {
     "@dordaneh/contracts": "*"
