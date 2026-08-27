@@ -1,0 +1,75 @@
+name: APK debug (نصب سریع روی گوشی)
+
+# این workflow هیچ سکرتی لازم ندارد — با کلید debug خود اندروید امضا می‌شود.
+# هدف: تست سریع اپ روی گوشی، پیش از درگیر شدن با keystore انتشار.
+#
+# ⚠️ خروجی این workflow برای آپلود در بازار/مایکت مناسب نیست
+#    (فروشگاه‌ها فقط بسته‌ی امضاشده با کلید انتشار را می‌پذیرند).
+#    برای انتشار از workflow «Release (signed APK + AAB)» استفاده کنید.
+#
+# اجرا: تب Actions → APK debug → Run workflow
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['integration/**']
+
+jobs:
+  debug-apk:
+    name: 📱 ساخت APK دیباگ
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: نصب وابستگی‌ها
+        run: npm install
+
+      - name: ساخت باندل وب
+        run: npm run build:app
+
+      - name: پیش‌نیاز تولید آیکون (تبدیل فونت وزیرمتن woff2 → ttf)
+        run: pip install --quiet fonttools brotli
+
+      - name: افزودن پلتفرم اندروید و sync کاپاسیتور
+        working-directory: native
+        run: |
+          npm install
+          npx cap add android || true
+          npx cap sync android
+          node tools/apply-overrides.mjs
+          node tools/gen-app-icons.mjs
+
+      - name: ساخت APK دیباگ
+        working-directory: native/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: آماده‌سازی خروجی
+        run: |
+          mkdir -p out
+          APK=$(find native/android/app/build/outputs/apk/debug -name '*.apk' | head -1)
+          cp "$APK" "out/dordaneh-debug.apk"
+          ls -lh out/
+          echo "### 📱 APK دیباگ ساخته شد" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "حجم: $(du -h out/dordaneh-debug.apk | cut -f1)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "از بخش Artifacts پایین همین صفحه دانلود کنید." >> $GITHUB_STEP_SUMMARY
+
+      - name: بارگذاری APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: dordaneh-debug-apk
+          path: out/*.apk
+          retention-days: 30
