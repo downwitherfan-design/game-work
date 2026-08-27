@@ -4,9 +4,11 @@
  * ۱) intent-filter های دیپ‌لینک را داخل MainActivity تزریق می‌کند.
  * ۲) بهینه‌سازی حجم را در app/build.gradle فعال می‌کند:
  *    minifyEnabled + shrinkResources + حذف ABI های غیرلازم.
+ * ۳) قواعد ProGuard/R8 را کپی می‌کند تا مینیفای، پل جاوااسکریپت کاپاسیتور را
+ *    نشکند (بدون این مرحله نسخه‌ی release با صفحه‌ی سفید بالا می‌آید).
  * idempotent است — اجرای چندباره امن است.
  */
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -79,5 +81,31 @@ function patchBuildGradle() {
   console.log('✅ minifyEnabled + shrinkResources + abiFilters اعمال شد.');
 }
 
+/**
+ * قواعد ProGuard را روی پروژه‌ی اندروید کپی می‌کند.
+ * حیاتی است چون build.gradle مینیفای را فعال کرده و R8 بدون این قواعد
+ * کلاس‌های کاپاسیتور و متدهای @JavascriptInterface را حذف می‌کند.
+ */
+function patchProguard() {
+  const src = resolve(here, '..', 'android-overrides/app/proguard-rules.pro');
+  const dest = resolve(androidDir, 'app/proguard-rules.pro');
+  if (!existsSync(src)) {
+    console.error(`❌ ${src} یافت نشد.`);
+    process.exit(1);
+  }
+  if (!existsSync(dirname(dest))) {
+    console.error(`❌ ${dirname(dest)} یافت نشد — اول \`npx cap add android\` را اجرا کنید.`);
+    process.exit(1);
+  }
+  const current = existsSync(dest) ? readFileSync(dest, 'utf8') : '';
+  if (current.includes('com.getcapacitor')) {
+    console.log('ℹ️ قواعد ProGuard قبلاً اعمال شده‌اند.');
+    return;
+  }
+  copyFileSync(src, dest);
+  console.log('✅ قواعد ProGuard/R8 محافظ پل کاپاسیتور اعمال شد.');
+}
+
 patchManifest();
 patchBuildGradle();
+patchProguard();

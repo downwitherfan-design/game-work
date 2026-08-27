@@ -7,9 +7,15 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --coverage",
+    "demo": "vite dev demo --port 3000 --host 0.0.0.0",
+    "demo:build": "vite build demo"
   },
   "dependencies": {
-    "@dordaneh/contracts": "*"
+    "@dordaneh/contracts": "*",
+    "@dordaneh/core-engine": "*",
+    "@dordaneh/ui-kit": "*",
+    "@dordaneh/audio-haptics": "*",
+    "preact": "10.24.3"
   }
 }

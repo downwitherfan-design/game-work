@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>دُردانه — دموی game-board (AI-06)</title>
+    <style>
+      /* توکن‌های قرارداد ui-kit §4 — فقط برای دمو (در اپ واقعی ui-kit تزریق می‌کند) */
+      :root {
+        --dor-bg: #f7f3e9;
+        --dor-correct: #4caf7d;
+        --dor-present: #e5a83b;
+        --dor-absent: #b7b0a3;
+        --dor-accent: #1ca9a6;
+        --dor-gold: #d4af37;
+        --dor-dark-bg: #1b2430;
+        --dor-dark-accent: #0e6e6b;
+        --dor-font: 'Vazirmatn', sans-serif;
+        --dor-radius: 12px;
+        --dor-space-1: 4px;
+        --dor-space-2: 8px;
+        --dor-space-3: 16px;
+        --dor-space-4: 24px;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--dor-bg);
+        min-height: 100%;
+        font-family: var(--dor-font);
+      }
+      #demo-nav {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        padding: 8px;
+        direction: rtl;
+      }
+      #demo-nav button {
+        font-family: var(--dor-font);
+        border: 1px solid var(--dor-accent);
+        background: transparent;
+        color: var(--dor-accent);
+        border-radius: 8px;
+        padding: 4px 12px;
+        cursor: pointer;
+      }
+      #demo-nav button.active {
+        background: var(--dor-accent);
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="demo-nav"></nav>
+    <div id="app"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

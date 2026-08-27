@@ -1,0 +1,305 @@
+/*
+ * استایل ساختاری پوسته — فقط layout/چیدمان.
+ * رنگ/فونت/فاصله فقط از CSS variables قرارداد §4 (خط قرمز ۲۵).
+ * RTL-first با خصوصیات logical (خط قرمز ۲۴).
+ */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--dor-bg);
+  color: var(--dor-fg, inherit);
+  font-family: var(--dor-font);
+  min-height: 100dvh;
+}
+
+#app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-inline-size: 560px;
+  margin-inline: auto;
+}
+
+.dor-topbar {
+  padding-block: var(--dor-space-2);
+  padding-inline: var(--dor-space-3);
+  text-align: center;
+}
+
+.dor-logo {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--dor-accent);
+}
+
+#main-outlet {
+  flex: 1;
+  padding-inline: var(--dor-space-3);
+  padding-block-end: calc(var(--dor-space-4) * 3);
+}
+
+.dor-screen h2 {
+  margin-block: var(--dor-space-3);
+}
+
+/* ناوبری پایین */
+.dor-bottom-nav {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline: 0;
+  display: flex;
+  justify-content: space-around;
+  padding-block: var(--dor-space-2);
+  padding-block-end: calc(var(--dor-space-2) + env(safe-area-inset-bottom, 0px));
+  background: var(--dor-surface, var(--dor-bg));
+  border-start-start-radius: var(--dor-radius);
+  border-start-end-radius: var(--dor-radius);
+  box-shadow: 0 -2px 12px rgb(0 0 0 / 8%);
+  max-inline-size: 560px;
+  margin-inline: auto;
+}
+
+.dor-bottom-nav a {
+  position: relative;
+  text-decoration: none;
+  color: var(--dor-absent);
+  font-size: 0.85rem;
+  padding-block: var(--dor-space-1);
+  padding-inline: var(--dor-space-2);
+  border-radius: var(--dor-radius);
+  transition: color 120ms ease;
+}
+
+.dor-bottom-nav a.active {
+  color: var(--dor-accent);
+  font-weight: 700;
+}
+
+/* بج زایگارنیک آلبوم */
+.dor-badge {
+  position: absolute;
+  inset-block-start: -4px;
+  inset-inline-end: -6px;
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 16px;
+  block-size: 16px;
+  font-size: 0.65rem;
+  border-radius: 999px;
+  background: var(--dor-gold);
+  color: var(--dor-dark-bg);
+}
+
+/* دکمه‌ی اصلی */
+.dor-primary {
+  display: inline-block;
+  border: 0;
+  cursor: pointer;
+  background: var(--dor-accent);
+  color: var(--dor-bg);
+  font-family: var(--dor-font);
+  font-size: 1rem;
+  padding-block: var(--dor-space-2);
+  padding-inline: var(--dor-space-4);
+  border-radius: var(--dor-radius);
+  text-decoration: none;
+}
+
+/* آنبوردینگ */
+.dor-onboarding {
+  padding: var(--dor-space-4);
+  text-align: center;
+}
+
+.dor-tooltip {
+  background: var(--dor-surface, var(--dor-bg));
+  border-inline-start: 3px solid var(--dor-accent);
+  padding: var(--dor-space-2) var(--dor-space-3);
+  margin-block: var(--dor-space-2);
+  border-radius: var(--dor-radius);
+  font-size: 0.9rem;
+  text-align: start;
+}
+
+.dor-peak-end {
+  font-weight: 700;
+  color: var(--dor-gold);
+}
+
+/* کارت فرهنگی */
+.dor-card {
+  display: block;
+  background: var(--dor-surface, var(--dor-bg));
+  border-radius: var(--dor-radius);
+  padding: var(--dor-space-3);
+  margin-block: var(--dor-space-3);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+}
+
+.dor-card small {
+  color: var(--dor-absent);
+}
+
+/* برد mock */
+.dor-board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dor-space-1);
+  margin-block: var(--dor-space-3);
+}
+
+.dor-row {
+  display: flex;
+  gap: var(--dor-space-1);
+  justify-content: center;
+}
+
+.dor-tile {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  border-radius: var(--dor-radius);
+  background: var(--dor-surface, var(--dor-bg));
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.dor-tile[data-state='correct'] {
+  background: var(--dor-correct);
+  color: #fff;
+}
+
+.dor-tile[data-state='present'] {
+  background: var(--dor-present);
+  color: #fff;
+}
+
+.dor-tile[data-state='absent'] {
+  background: var(--dor-absent);
+  color: #fff;
+}
+
+.dor-guess-form {
+  display: flex;
+  gap: var(--dor-space-2);
+  justify-content: center;
+}
+
+.dor-guess-form input {
+  font-family: var(--dor-font);
+  font-size: 1.1rem;
+  padding: var(--dor-space-2);
+  border-radius: var(--dor-radius);
+  border: 1px solid var(--dor-absent);
+  background: var(--dor-surface, var(--dor-bg));
+  color: inherit;
+  text-align: center;
+}
+
+.dor-guess-form button {
+  font-family: var(--dor-font);
+  border: 0;
+  border-radius: var(--dor-radius);
+  background: var(--dor-accent);
+  color: var(--dor-bg);
+  padding-inline: var(--dor-space-3);
+  cursor: pointer;
+}
+
+/* تنظیمات */
+.dor-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dor-space-3);
+  padding-block: var(--dor-space-3);
+  border-block-end: 1px solid rgb(0 0 0 / 8%);
+}
+
+.dor-settings-label {
+  display: flex;
+  flex-direction: column;
+}
+
+.dor-settings-label small {
+  color: var(--dor-absent);
+}
+
+.dor-segmented {
+  display: flex;
+  gap: var(--dor-space-1);
+}
+
+.dor-segmented button {
+  font-family: var(--dor-font);
+  border: 1px solid var(--dor-absent);
+  background: transparent;
+  color: inherit;
+  padding-block: var(--dor-space-1);
+  padding-inline: var(--dor-space-2);
+  border-radius: var(--dor-radius);
+  cursor: pointer;
+}
+
+.dor-segmented button[aria-checked='true'] {
+  background: var(--dor-accent);
+  border-color: var(--dor-accent);
+  color: var(--dor-bg);
+}
+
+.dor-about,
+.dor-privacy {
+  margin-block: var(--dor-space-3);
+}
+
+/* بنر بازیابی جلسه */
+.dor-resume {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--dor-surface, var(--dor-bg));
+  border-inline-start: 3px solid var(--dor-gold);
+  padding: var(--dor-space-2) var(--dor-space-3);
+  border-radius: var(--dor-radius);
+  margin-block: var(--dor-space-2);
+}
+
+.dor-resume a {
+  color: var(--dor-accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.dor-mock-note {
+  font-size: 0.8rem;
+  color: var(--dor-absent);
+}
+
+.dor-album-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dor-space-2);
+}
+
+/* انیمیشن‌ها فقط با transform/opacity (خط قرمز ۲۷) */
+@media (prefers-reduced-motion: no-preference) {
+  .dor-screen {
+    animation: dor-fade-in 180ms ease;
+  }
+
+  @keyframes dor-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

@@ -7,9 +7,24 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit && vite build",
-    "test": "vitest run --passWithNoTests"
+    "dev": "vite",
+    "preview": "vite preview --host 0.0.0.0 --port 3000",
+    "test": "vitest run --coverage --passWithNoTests"
   },
   "dependencies": {
-    "@dordaneh/contracts": "*"
+    "@dordaneh/contracts": "*",
+    "@dordaneh/core-engine": "*",
+    "@dordaneh/word-db": "*",
+    "@dordaneh/culture-cards": "*",
+    "@dordaneh/ui-kit": "*",
+    "@dordaneh/game-board": "*",
+    "@dordaneh/viral-share": "*",
+    "@dordaneh/meta-retention": "*",
+    "@dordaneh/duel-mode": "*",
+    "@dordaneh/monetization": "*",
+    "@dordaneh/analytics": "*",
+    "@dordaneh/audio-haptics": "*",
+    "preact": "10.24.3",
+    "preact-iso": "2.6.3"
   }
 }

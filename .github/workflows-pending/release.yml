@@ -1,0 +1,165 @@
+name: Release (signed APK + AAB)
+
+# جایگزین نسخه‌ی قبلی .github/workflows/release.yml
+# تفاوت‌های کلیدی:
+#   ۱) هم APK می‌سازد و هم AAB — مایکت APK می‌خواهد و بازار هم APK را
+#      بدون دردسر می‌پذیرد؛ نسخه‌ی قبلی فقط AAB می‌ساخت.
+#   ۲) اجرای دستی (workflow_dispatch) با ورودی نسخه — نیازی به ساختن tag نیست.
+#   ۳) آیکون رسمی اپ را هم تولید می‌کند (آیکون پیش‌فرض کاپاسیتور رد می‌شود).
+#   ۴) versionCode/versionName را از نسخه‌ی ورودی تنظیم می‌کند.
+#
+# سکرت‌های لازم (Settings → Secrets and variables → Actions):
+#   KEYSTORE_B64  — فایل keystore به‌صورت base64
+#   KEYSTORE_PASS — رمز keystore
+#   KEY_ALIAS     — نام alias کلید
+#   KEY_PASS      — رمز کلید
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'نسخه (مثلاً 1.0.0)'
+        required: true
+        default: '1.0.0'
+      version_code:
+        description: 'versionCode (عدد صحیح، هر انتشار باید بزرگ‌تر از قبلی باشد)'
+        required: true
+        default: '1'
+
+jobs:
+  release:
+    name: 🚀 ساخت و امضای APK + AAB برای بازار و مایکت
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: تعیین نسخه
+        id: ver
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ inputs.version }}" >> $GITHUB_OUTPUT
+            echo "code=${{ inputs.version_code }}" >> $GITHUB_OUTPUT
+          else
+            V="${GITHUB_REF_NAME#v}"
+            echo "name=$V" >> $GITHUB_OUTPUT
+            echo "code=$GITHUB_RUN_NUMBER" >> $GITHUB_OUTPUT
+          fi
+
+      - name: نصب وابستگی‌ها
+        run: npm install
+
+      - name: بیلد همه‌ی workspace ها
+        run: npm run build
+
+      - name: اجرای تست‌ها
+        run: npm test
+
+      - name: بررسی بودجه‌ی حجم وب
+        run: node tools/check-budget.mjs web packages/app-shell/dist
+
+      - name: پیش‌نیاز تولید آیکون (تبدیل فونت وزیرمتن woff2 → ttf)
+        run: pip install --quiet fonttools brotli
+
+      - name: افزودن پلتفرم اندروید و sync کاپاسیتور
+        working-directory: native
+        run: |
+          npm install
+          npx cap add android || true
+          npx cap sync android
+          node tools/apply-overrides.mjs
+          node tools/gen-app-icons.mjs
+
+      - name: تنظیم versionName و versionCode
+        working-directory: native/android/app
+        run: |
+          sed -i 's/versionName ".*"/versionName "${{ steps.ver.outputs.name }}"/' build.gradle
+          sed -i 's/versionCode [0-9]*/versionCode ${{ steps.ver.outputs.code }}/' build.gradle
+          grep -E 'versionCode|versionName' build.gradle
+
+      - name: بازگشایی keystore از سکرت‌ها
+        working-directory: native
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then
+            echo "::error::سکرت KEYSTORE_B64 تنظیم نشده — راهنما: native/README.md"
+            exit 1
+          fi
+          echo "$KEYSTORE_B64" | base64 -d > android/app/dordaneh-release.keystore
+          echo "اندازه‌ی keystore: $(stat -c%s android/app/dordaneh-release.keystore) بایت"
+
+      - name: ساخت APK و AAB امضاشده
+        working-directory: native/android
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.KEY_PASS }}
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease bundleRelease --no-daemon \
+            -Pandroid.injected.signing.store.file="$PWD/app/dordaneh-release.keystore" \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASS" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASS"
+
+      - name: بررسی بودجه‌ی حجم AAB
+        run: |
+          AAB=$(find native/android/app/build/outputs/bundle/release -name '*.aab' | head -1)
+          node tools/check-budget.mjs aab "$AAB"
+
+      - name: تأیید امضا
+        run: |
+          APK=$(find native/android/app/build/outputs/apk/release -name '*.apk' | head -1)
+          BT=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)
+          "$ANDROID_HOME/build-tools/$BT/apksigner" verify --print-certs "$APK" | head -20
+
+      - name: آماده‌سازی خروجی‌ها
+        id: out
+        run: |
+          mkdir -p out
+          V="${{ steps.ver.outputs.name }}"
+          APK=$(find native/android/app/build/outputs/apk/release -name '*.apk' | head -1)
+          AAB=$(find native/android/app/build/outputs/bundle/release -name '*.aab' | head -1)
+          cp "$APK" "out/dordaneh-$V.apk"
+          cp "$AAB" "out/dordaneh-$V.aab"
+          ls -lh out/
+          {
+            echo "### 🎉 بسته‌های انتشار دُردانه $V"
+            echo ""
+            echo "| فایل | حجم | مقصد |"
+            echo "|---|---|---|"
+            echo "| dordaneh-$V.apk | $(du -h out/dordaneh-$V.apk | cut -f1) | مایکت و بازار |"
+            echo "| dordaneh-$V.aab | $(du -h out/dordaneh-$V.aab | cut -f1) | بازار (اختیاری) |"
+            echo ""
+            echo "versionCode: ${{ steps.ver.outputs.code }}"
+            echo ""
+            echo "از بخش Artifacts پایین همین صفحه دانلود کنید."
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: بارگذاری بسته‌ها
+        uses: actions/upload-artifact@v4
+        with:
+          name: dordaneh-release-${{ steps.ver.outputs.name }}
+          path: out/*
+          retention-days: 90
+
+      - name: ساخت Release در گیت‌هاب
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/*
+          generate_release_notes: true

@@ -1,0 +1,204 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+import { createEventBus, STORAGE_KEYS, type AppEvent } from '@dordaneh/contracts';
+import { createShellStorage, type ShellStorage } from '../src/core/storage';
+import { createOrchestrator, SHELL_KEYS } from '../src/services/orchestrator';
+import { createServices, type ShellServices } from '../src/services/registry';
+import { resetBusForTests, getBus } from '../src/core/bus';
+
+function setup(): {
+  bus: ReturnType<typeof createEventBus>;
+  storage: ShellStorage;
+  services: ShellServices;
+  orch: ReturnType<typeof createOrchestrator>;
+} {
+  const bus = createEventBus();
+  const storage = createShellStorage({});
+  const services = createServices(bus, storage);
+  const orch = createOrchestrator(bus, services, storage);
+  return { bus, storage, services, orch };
+}
+
+/**
+ * پاسخ صحیح معمای آنبوردینگ را از خود word-db می‌خواند (seed=0،
+ * difficulty=1 — مطابق createEngine.getOnboardingPuzzle). این‌گونه تست به
+ * واژه‌ی خاصی hardcode نیست و با به‌روزرسانی واژه‌نامه‌ی AI-02 نمی‌شکند.
+ */
+function onboardingAnswer(services: ShellServices): string {
+  return services.wordDb.getPracticeAnswer(0, 1).word;
+}
+
+/** پاسخ صحیح یک معمای تمرینی مشخص */
+function practiceAnswer(services: ShellServices, seed: number, difficulty: number): string {
+  return services.wordDb.getPracticeAnswer(seed, difficulty).word;
+}
+
+describe('getBus — singleton', () => {
+  beforeEach(() => resetBusForTests());
+  it('یک نمونه‌ی واحد برمی‌گرداند', () => {
+    expect(getBus()).toBe(getBus());
+  });
+});
+
+describe('createServices — سوییچ mock خودکار', () => {
+  it('پس از ادغام کامل: موتور، word-db و صدا واقعی‌اند و کلیدهای قرارداد ثابت‌اند', () => {
+    const { services } = setup();
+    // پکیج‌هایی که پیاده‌سازی واقعی‌شان ادغام شده — نباید mock باشند
+    expect(services.mockFlags.engine).toBe(false); // AI-01 core-engine
+    expect(services.mockFlags.wordDb).toBe(false); // AI-02 word-db
+    expect(services.mockFlags.audio).toBe(false); // AI-13 audio-haptics
+    // کلیدهای پرچم قراردادی تغییر نکرده‌اند (§6)
+    expect(Object.keys(services.mockFlags).sort()).toEqual(
+      ['analytics', 'audio', 'culture', 'engine', 'monetization', 'share', 'wordDb'].sort(),
+    );
+  });
+
+  it('موتور واقعی با wordDb تزریقی کار می‌کند: آنبوردینگ و روزانه و تمرین', () => {
+    const { services } = setup();
+    const ob = services.engine.getOnboardingPuzzle();
+    expect(ob.puzzleId).toBeTruthy();
+    expect(ob.wordLength).toBeGreaterThan(0);
+    const daily = services.engine.getDailyPuzzle(3);
+    expect(daily.wordLength).toBe(6);
+    const practice = services.engine.getPracticePuzzle(2, 5);
+    expect(practice.puzzleId.startsWith('practice-')).toBe(true);
+  });
+
+  it('موتور واقعی پس از پایان بازی پرتاب می‌کند — پوسته باید گارد داشته باشد', () => {
+    const { services } = setup();
+    const { puzzleId } = services.engine.getOnboardingPuzzle();
+    const res = services.engine.evaluateGuess(puzzleId, onboardingAnswer(services));
+    expect('error' in res).toBe(false);
+    expect(services.engine.getState(puzzleId).status).toBe('won');
+    // حدس پس از برد → موتور واقعی EngineError(GAME_OVER) پرتاب می‌کند
+    expect(() => services.engine.evaluateGuess(puzzleId, onboardingAnswer(services))).toThrow();
+  });
+});
+
+describe('Orchestrator — wiring آنالیتیکس (§8)', () => {
+  it('هر رویداد قراردادی به AnalyticsApi.track می‌رسد (صف آفلاین)', () => {
+    const { bus, storage } = setup();
+    bus.emit({ type: 'screen_viewed', screen: '/' });
+    bus.emit({ type: 'share_initiated', surface: 'result' });
+    const queue = storage.get<AppEvent[]>(STORAGE_KEYS.analyticsQueue);
+    expect(queue?.map((e) => e.type)).toEqual(['screen_viewed', 'share_initiated']);
+  });
+
+  it('dispose قطع اتصال می‌کند', () => {
+    const { bus, storage, orch } = setup();
+    orch.dispose();
+    bus.emit({ type: 'screen_viewed', screen: '/x' });
+    expect(storage.get(STORAGE_KEYS.analyticsQueue)).toBeNull();
+  });
+});
+
+describe('Orchestrator — جریان پس از حل', () => {
+  it('برد: culture_card → streak_update → share_prompt + بج آلبوم + card_revealed', () => {
+    const { bus, services, storage, orch } = setup();
+    // بازی تا برد
+    const { puzzleId } = services.engine.getOnboardingPuzzle();
+    services.engine.evaluateGuess(puzzleId, onboardingAnswer(services));
+
+    const stepsSeen: string[][] = [];
+    orch.onPostSolve((steps) => stepsSeen.push(steps.map((s) => s.step)));
+    const revealed: string[] = [];
+    bus.on('card_revealed', (e) => revealed.push(e.cardId));
+
+    bus.emit({ type: 'puzzle_finished', puzzleId, won: true, guessCount: 1, durationMs: 100 });
+
+    expect(stepsSeen[0]).toEqual(['culture_card', 'streak_update', 'share_prompt']);
+    expect(revealed).toHaveLength(1);
+    expect(orch.hasAlbumBadge()).toBe(true);
+    expect(storage.get<string[]>(STORAGE_KEYS.album)).toHaveLength(1);
+  });
+
+  it('باخت: بدون کارت، فقط streak و share', () => {
+    const { bus, orch } = setup();
+    const stepsSeen: string[][] = [];
+    orch.onPostSolve((steps) => stepsSeen.push(steps.map((s) => s.step)));
+    bus.emit({ type: 'puzzle_finished', puzzleId: 'daily-9', won: false, guessCount: 6, durationMs: 100 });
+    expect(stepsSeen[0]).toEqual(['streak_update', 'share_prompt']);
+    expect(orch.hasAlbumBadge()).toBe(false);
+  });
+
+  it('کشف تکراری همان کارت، بج/آلبوم را دوباره ثبت نمی‌کند', () => {
+    const { bus, services, storage, orch } = setup();
+    const { puzzleId } = services.engine.getOnboardingPuzzle();
+    services.engine.evaluateGuess(puzzleId, onboardingAnswer(services));
+    bus.emit({ type: 'puzzle_finished', puzzleId, won: true, guessCount: 1, durationMs: 1 });
+    orch.clearAlbumBadge();
+    bus.emit({ type: 'puzzle_finished', puzzleId, won: true, guessCount: 1, durationMs: 1 });
+    expect(storage.get<string[]>(STORAGE_KEYS.album)).toHaveLength(1);
+    expect(orch.hasAlbumBadge()).toBe(false);
+  });
+
+  it('خطای callback مصرف‌کننده، بقیه را نمی‌شکند', () => {
+    const { bus, orch } = setup();
+    const seen: string[] = [];
+    orch.onPostSolve(() => {
+      throw new Error('boom');
+    });
+    orch.onPostSolve(() => seen.push('ok'));
+    bus.emit({ type: 'puzzle_finished', puzzleId: 'daily-1', won: false, guessCount: 6, durationMs: 1 });
+    expect(seen).toEqual(['ok']);
+  });
+
+  it('unsubscribe onPostSolve کار می‌کند', () => {
+    const { bus, orch } = setup();
+    const seen: string[] = [];
+    const off = orch.onPostSolve(() => seen.push('x'));
+    off();
+    bus.emit({ type: 'puzzle_finished', puzzleId: 'daily-1', won: false, guessCount: 6, durationMs: 1 });
+    expect(seen).toEqual([]);
+  });
+});
+
+describe('Orchestrator — بازیابی جلسه', () => {
+  it('puzzle_started جلسه را ثبت می‌کند؛ فقط با حدسِ ثبت‌شده resumable است', () => {
+    const { bus, services, orch } = setup();
+    const { puzzleId } = services.engine.getDailyPuzzle(3);
+    bus.emit({ type: 'puzzle_started', puzzleId, mode: 'daily' });
+    // هنوز حدسی نه → resumable نیست
+    expect(orch.getResumableSession()).toBeNull();
+    // یک حدس غلط
+    services.engine.evaluateGuess(puzzleId, 'مهربان');
+    const s = orch.getResumableSession();
+    if (services.engine.getState(puzzleId).status === 'playing') {
+      expect(s).toEqual({ puzzleId, route: '/' });
+    }
+  });
+
+  it('mode=practice → route تمرین', () => {
+    const { bus, services, orch } = setup();
+    const { puzzleId } = services.engine.getPracticePuzzle(1, 7);
+    bus.emit({ type: 'puzzle_started', puzzleId, mode: 'practice' });
+    services.engine.evaluateGuess(puzzleId, practiceAnswer(services, 1, 7));
+    if (services.engine.getState(puzzleId).status === 'playing') {
+      expect(orch.getResumableSession()?.route).toBe('/practice');
+    }
+  });
+
+  it('puzzle_finished جلسه را پاک می‌کند', () => {
+    const { bus, services, orch, storage } = setup();
+    const { puzzleId } = services.engine.getDailyPuzzle(3);
+    bus.emit({ type: 'puzzle_started', puzzleId, mode: 'daily' });
+    bus.emit({ type: 'puzzle_finished', puzzleId, won: true, guessCount: 2, durationMs: 5 });
+    expect(storage.get(SHELL_KEYS.session)).toBeNull();
+    expect(orch.getResumableSession()).toBeNull();
+  });
+
+  it('جلسه با puzzleId ثبت‌نشده در موتور (مثلاً پس از reload) بی‌صدا null می‌شود', () => {
+    const { bus, orch } = setup();
+    // موتور واقعی برای این id ثبتی ندارد → getState پرتاب می‌کند → گارد ما null برمی‌گرداند
+    bus.emit({ type: 'puzzle_started', puzzleId: 'daily-999', mode: 'daily' });
+    expect(orch.getResumableSession()).toBeNull();
+  });
+});
+
+describe('Orchestrator — آنبوردینگ', () => {
+  it('پیش‌فرض onboarded=false؛ mark → true', () => {
+    const { orch } = setup();
+    expect(orch.isOnboarded()).toBe(false);
+    orch.markOnboarded();
+    expect(orch.isOnboarded()).toBe(true);
+  });
+});
