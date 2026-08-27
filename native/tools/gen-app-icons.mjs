@@ -114,8 +114,11 @@ function renderBase(out, font, fullBleed = false) {
   bgArgs.push(bgPath);
   sh('magick', bgArgs);
 
-  // ۳) ترکیب: حرف را مقیاس و دقیقاً وسط می‌چینیم
-  const glyphBox = fullBleed ? Math.round(S * 0.4) : Math.round(S * 0.56);
+  // ۳) ترکیب: حرف را مقیاس و دقیقاً وسط می‌چینیم.
+  //    نسبت‌ها محافظه‌کارانه است تا حرف به حاشیه‌ی طلایی نچسبد و در اندازه‌ی
+  //    کوچک لانچر «خفه» دیده نشود. foreground آیکون adaptive کوچک‌تر است چون
+  //    اندروید حدود یک‌سوم لبه را برش می‌زند.
+  const glyphBox = fullBleed ? Math.round(S * 0.36) : Math.round(S * 0.46);
   sh('magick', [
     bgPath,
     '(',
