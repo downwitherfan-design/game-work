@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>دُردانه 💎 — بازی معمای کلمات فارسی روزانه</title>
+  <meta name="description" content="هر روز یک معمای ۶ حرفی؛ حلش کن، یک کارت فرهنگی زیبا کشف کن و استریکت را زنده نگه دار." />
+
+  <!-- Open Graph — پیش‌نمایش غنی در تلگرام/واتساپ -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="دُردانه" />
+  <meta property="og:title" content="دُردانه 💎 — معمای کلمات فارسی روزانه" />
+  <meta property="og:description" content="دعوت شدی! هر روز یک معمای ۶ حرفی؛ حلش کن، کارت فرهنگی کشف کن، با دوستات رقابت کن." />
+  <meta property="og:url" content="https://dordaneh.app/" />
+  <meta property="og:image" content="https://dordaneh.app/og-cover.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="fa_IR" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="دُردانه 💎 — معمای کلمات فارسی روزانه" />
+  <meta name="twitter:description" content="هر روز یک معما، یک کشف. تو هم بازی کن!" />
+  <meta name="twitter:image" content="https://dordaneh.app/og-cover.png" />
+
+  <!-- فونت وزیرمتن (متن‌باز) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" />
+
+  <style>
+    /* توکن‌های قرارداد ui-kit §4 — تعریف :root چون این صفحه مستقل از اپ لود می‌شود */
+    :root {
+      --dor-bg: #F7F3E9; --dor-correct: #4CAF7D; --dor-present: #E5A83B;
+      --dor-absent: #B7B0A3; --dor-accent: #1CA9A6; --dor-gold: #D4AF37;
+      --dor-dark-bg: #1B2430; --dor-dark-accent: #0E6E6B;
+      --dor-font: 'Vazirmatn', sans-serif; --dor-radius: 12px;
+      --dor-space-1: 4px; --dor-space-2: 8px; --dor-space-3: 16px; --dor-space-4: 24px;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      font-family: var(--dor-font);
+      background: var(--dor-bg);
+      color: var(--dor-dark-bg);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: var(--dor-space-4);
+    }
+    .landing-card { max-inline-size: 420px; inline-size: 100%; text-align: center; }
+    .logo-tile {
+      inline-size: 96px; block-size: 96px;
+      background: var(--dor-accent); color: var(--dor-bg);
+      border-radius: 22px; font-size: 56px; font-weight: 800;
+      display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 24px rgb(28 169 166 / .35);
+      margin-block-end: var(--dor-space-3);
+    }
+    h1 { font-size: 1.8rem; margin-block-end: var(--dor-space-2); }
+    .tagline { color: var(--dor-dark-accent); margin-block-end: var(--dor-space-4); line-height: 1.9; }
+    .invite-preview {
+      background: #fff; border: 2px solid var(--dor-present);
+      border-radius: var(--dor-radius); padding: var(--dor-space-3);
+      margin-block-end: var(--dor-space-4); line-height: 2;
+      display: none;
+    }
+    .invite-preview.visible { display: block; }
+    .invite-preview .kind { font-weight: 700; color: var(--dor-accent); }
+    .mini-grid { font-size: 1.3rem; letter-spacing: 2px; margin-block-start: var(--dor-space-2); }
+    .cta {
+      display: block; inline-size: 100%;
+      background: var(--dor-correct); color: #fff;
+      font-family: var(--dor-font); font-size: 1.15rem; font-weight: 700;
+      border: none; border-radius: var(--dor-radius);
+      padding: var(--dor-space-3); cursor: pointer;
+      text-decoration: none; margin-block-end: var(--dor-space-2);
+      transition: transform .12s;
+    }
+    .cta:active { transform: scale(.97); }
+    .cta--store { background: var(--dor-accent); }
+    .footnote { font-size: .82rem; color: var(--dor-absent); margin-block-start: var(--dor-space-3); }
+    @media (prefers-color-scheme: dark) {
+      body { background: var(--dor-dark-bg); color: var(--dor-bg); }
+      .invite-preview { background: rgb(255 255 255 / .06); }
+    }
+  </style>
+</head>
+<body>
+  <main class="landing-card" id="landing-main">
+    <div class="logo-tile" aria-hidden="true">د</div>
+    <h1 id="landing-title">دُردانه 💎</h1>
+    <p class="tagline" id="landing-tagline">بازی معمای کلمات فارسی روزانه<br />هر روز یک معما، یک کشف</p>
+
+    <section class="invite-preview" id="invite-preview" aria-live="polite">
+      <span class="kind" id="invite-kind"></span>
+      <div id="invite-text"></div>
+      <div class="mini-grid" aria-hidden="true">🟨🟩⬜🟩🟩🟩</div>
+    </section>
+
+    <a class="cta" id="cta-play" href="/">🎮 بازی در وب</a>
+    <a class="cta cta--store" id="cta-install" href="https://cafebazaar.ir/app/app.dordaneh" rel="noopener">📲 نصب از بازار</a>
+
+    <p class="footnote" id="landing-footnote">اگر اپ را نصب داری، لینک به‌طور خودکار داخل اپ باز می‌شود.</p>
+  </main>
+
+  <script>
+    // تشخیص نوع دعوت از مسیر: /d/<duelId> یا /c/<circleId>
+    (function () {
+      var m = /^\/(d|c)\/([^/]+)/.exec(location.pathname);
+      if (!m) return;
+      var kind = m[1];
+      var preview = document.getElementById('invite-preview');
+      var kindEl = document.getElementById('invite-kind');
+      var textEl = document.getElementById('invite-text');
+      if (kind === 'd') {
+        kindEl.textContent = '⚔️ دعوت به دوئل';
+        textEl.textContent = 'یک دوست تو را به رقابت ۱به۱ دعوت کرده — می‌تونی با حدس‌های کمتر ببری؟';
+      } else {
+        kindEl.textContent = '👥 دعوت به حلقه‌ی دوستان';
+        textEl.textContent = 'به لیدربورد خصوصی دوستانت بپیوند و ببین کی زرنگ‌تره!';
+      }
+      preview.classList.add('visible');
+      // انتقال دعوت به اپ وب: مسیر همان می‌ماند، اپ‌شل روت /d و /c را می‌گیرد
+      document.getElementById('cta-play').href = location.pathname + location.search;
+      // در native: Capacitor App Links همین URL را intercept می‌کند (پیکربندی: AI-14)
+      document.title = (kind === 'd' ? 'دعوت به دوئل — ' : 'دعوت به حلقه — ') + 'دُردانه 💎';
+    })();
+  </script>
+</body>
+</html>

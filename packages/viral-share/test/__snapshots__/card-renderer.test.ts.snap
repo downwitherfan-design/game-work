@@ -1,0 +1,48 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renderCultureCard — snapshot رندر canvas > snapshot ساختاری: توالی عملیات رسم قطعی و پایدار است 1`] = `
+[
+  "addColorStop",
+  "addColorStop",
+  "fillRect",
+  "beginPath",
+  "moveTo",
+  "arcTo",
+  "arcTo",
+  "arcTo",
+  "arcTo",
+  "closePath",
+  "stroke",
+  "beginPath",
+  "moveTo",
+  "arcTo",
+  "arcTo",
+  "arcTo",
+  "arcTo",
+  "closePath",
+  "fill",
+  "fillText",
+  "fillText",
+  "beginPath",
+  "moveTo",
+  "lineTo",
+  "stroke",
+  "fillText",
+  "fillText",
+  "fillText",
+  "fillText",
+  "fillText",
+]
+`;
+
+exports[`renderCultureCard — snapshot رندر canvas > snapshot ساختاری: توالی عملیات رسم قطعی و پایدار است 2`] = `
+[
+  "د",
+  "ضرب‌المثل روز",
+  "هر که بامش بیش، برفش بیشتر",
+  "هر چه دارایی و مسئولیت بیشتر",
+  "باشد، دردسر هم بیشتر است.",
+  "— امثال و حکم دهخدا",
+  "dordaneh.app",
+]
+`;
