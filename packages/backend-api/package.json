@@ -7,9 +7,18 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --coverage",
+    "dev": "wrangler dev --local --port 8787",
+    "db:migrate:local": "wrangler d1 migrations apply dordaneh-production --local",
+    "db:migrate:prod": "wrangler d1 migrations apply dordaneh-production --remote",
+    "db:console:local": "wrangler d1 execute dordaneh-production --local",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "@dordaneh/contracts": "*"
+    "@dordaneh/contracts": "*",
+    "hono": "4.6.3"
+  },
+  "devDependencies": {
+    "wrangler": "3.80.0"
   }
 }

@@ -1,0 +1,6 @@
+# محلی wrangler — دیتابیس SQLite لوکال و کش
+.wrangler/
+dist/
+coverage/
+# secrets لوکال — هرگز کامیت نشود (خط قرمز ۱۱)
+.dev.vars
