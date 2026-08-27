@@ -18,6 +18,20 @@ function setup(): {
   return { bus, storage, services, orch };
 }
 
+/**
+ * پاسخ صحیح معمای آنبوردینگ را از خود word-db می‌خواند (seed=0،
+ * difficulty=1 — مطابق createEngine.getOnboardingPuzzle). این‌گونه تست به
+ * واژه‌ی خاصی hardcode نیست و با به‌روزرسانی واژه‌نامه‌ی AI-02 نمی‌شکند.
+ */
+function onboardingAnswer(services: ShellServices): string {
+  return services.wordDb.getPracticeAnswer(0, 1).word;
+}
+
+/** پاسخ صحیح یک معمای تمرینی مشخص */
+function practiceAnswer(services: ShellServices, seed: number, difficulty: number): string {
+  return services.wordDb.getPracticeAnswer(seed, difficulty).word;
+}
+
 describe('getBus — singleton', () => {
   beforeEach(() => resetBusForTests());
   it('یک نمونه‌ی واحد برمی‌گرداند', () => {
@@ -26,17 +40,16 @@ describe('getBus — singleton', () => {
 });
 
 describe('createServices — سوییچ mock خودکار', () => {
-  it('موتور (AI-01) و صدا (AI-13) واقعی‌اند؛ بقیه هنوز mock قراردادی', () => {
+  it('پس از ادغام کامل: موتور، word-db و صدا واقعی‌اند و کلیدهای قرارداد ثابت‌اند', () => {
     const { services } = setup();
-    expect(services.mockFlags).toEqual({
-      engine: false, // @dordaneh/core-engine واقعی — createEngine({ wordDb })
-      wordDb: true, // @dordaneh/word-db هنوز خالی → mock تزریق می‌شود
-      culture: true,
-      audio: false, // @dordaneh/audio-haptics واقعی — createAudio({ storage })
-      analytics: true,
-      monetization: true,
-      share: true,
-    });
+    // پکیج‌هایی که پیاده‌سازی واقعی‌شان ادغام شده — نباید mock باشند
+    expect(services.mockFlags.engine).toBe(false); // AI-01 core-engine
+    expect(services.mockFlags.wordDb).toBe(false); // AI-02 word-db
+    expect(services.mockFlags.audio).toBe(false); // AI-13 audio-haptics
+    // کلیدهای پرچم قراردادی تغییر نکرده‌اند (§6)
+    expect(Object.keys(services.mockFlags).sort()).toEqual(
+      ['analytics', 'audio', 'culture', 'engine', 'monetization', 'share', 'wordDb'].sort(),
+    );
   });
 
   it('موتور واقعی با wordDb تزریقی کار می‌کند: آنبوردینگ و روزانه و تمرین', () => {
@@ -53,11 +66,11 @@ describe('createServices — سوییچ mock خودکار', () => {
   it('موتور واقعی پس از پایان بازی پرتاب می‌کند — پوسته باید گارد داشته باشد', () => {
     const { services } = setup();
     const { puzzleId } = services.engine.getOnboardingPuzzle();
-    const res = services.engine.evaluateGuess(puzzleId, 'دردانه');
+    const res = services.engine.evaluateGuess(puzzleId, onboardingAnswer(services));
     expect('error' in res).toBe(false);
     expect(services.engine.getState(puzzleId).status).toBe('won');
     // حدس پس از برد → موتور واقعی EngineError(GAME_OVER) پرتاب می‌کند
-    expect(() => services.engine.evaluateGuess(puzzleId, 'دردانه')).toThrow();
+    expect(() => services.engine.evaluateGuess(puzzleId, onboardingAnswer(services))).toThrow();
   });
 });
 
@@ -83,7 +96,7 @@ describe('Orchestrator — جریان پس از حل', () => {
     const { bus, services, storage, orch } = setup();
     // بازی تا برد
     const { puzzleId } = services.engine.getOnboardingPuzzle();
-    services.engine.evaluateGuess(puzzleId, 'دردانه');
+    services.engine.evaluateGuess(puzzleId, onboardingAnswer(services));
 
     const stepsSeen: string[][] = [];
     orch.onPostSolve((steps) => stepsSeen.push(steps.map((s) => s.step)));
@@ -110,7 +123,7 @@ describe('Orchestrator — جریان پس از حل', () => {
   it('کشف تکراری همان کارت، بج/آلبوم را دوباره ثبت نمی‌کند', () => {
     const { bus, services, storage, orch } = setup();
     const { puzzleId } = services.engine.getOnboardingPuzzle();
-    services.engine.evaluateGuess(puzzleId, 'دردانه');
+    services.engine.evaluateGuess(puzzleId, onboardingAnswer(services));
     bus.emit({ type: 'puzzle_finished', puzzleId, won: true, guessCount: 1, durationMs: 1 });
     orch.clearAlbumBadge();
     bus.emit({ type: 'puzzle_finished', puzzleId, won: true, guessCount: 1, durationMs: 1 });
@@ -158,7 +171,7 @@ describe('Orchestrator — بازیابی جلسه', () => {
     const { bus, services, orch } = setup();
     const { puzzleId } = services.engine.getPracticePuzzle(1, 7);
     bus.emit({ type: 'puzzle_started', puzzleId, mode: 'practice' });
-    services.engine.evaluateGuess(puzzleId, 'کتاب');
+    services.engine.evaluateGuess(puzzleId, practiceAnswer(services, 1, 7));
     if (services.engine.getState(puzzleId).status === 'playing') {
       expect(orch.getResumableSession()?.route).toBe('/practice');
     }

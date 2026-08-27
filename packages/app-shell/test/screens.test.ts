@@ -16,13 +16,26 @@ import {
 } from '../src/mocks/screens.mock';
 
 describe('screen resolver — سوییچ واقعی/mock (§6)', () => {
-  it('پکیج‌های خالی → mock قراردادی', async () => {
-    await expect(loadGameScreen()).resolves.toBe(MockGameScreen);
-    await expect(loadStatsScreen()).resolves.toBe(MockStatsScreen);
-    await expect(loadAlbumScreen()).resolves.toBe(MockAlbumScreen);
-    await expect(loadDuelScreen()).resolves.toBe(MockDuelScreen);
-    await expect(loadShopScreen()).resolves.toBe(MockShopScreen);
-  });
+  /**
+   * پس از ادغام کامل پکیج‌ها، هر لودر باید صفحه‌ی **واقعی** را برگرداند نه mock.
+   * این تست هم پیاده‌سازی‌شدن صفحه‌ها را تضمین می‌کند و هم سالم‌بودن مکانیزم
+   * resolve را (چون در نبود export، mock برمی‌گشت و تست fail می‌شد).
+   */
+  const cases: ReadonlyArray<readonly [string, () => Promise<unknown>, unknown, string]> = [
+    ['GameScreen', loadGameScreen, MockGameScreen, '@dordaneh/game-board'],
+    ['StatsScreen', loadStatsScreen, MockStatsScreen, '@dordaneh/meta-retention'],
+    ['AlbumScreen', loadAlbumScreen, MockAlbumScreen, '@dordaneh/meta-retention'],
+    ['DuelScreen', loadDuelScreen, MockDuelScreen, '@dordaneh/duel-mode'],
+    ['ShopScreen', loadShopScreen, MockShopScreen, 'آداپتور @dordaneh/monetization'],
+  ];
+
+  for (const [name, load, mock, source] of cases) {
+    it(`${name} واقعی از ${source} لود می‌شود (نه mock)`, async () => {
+      const comp = await load();
+      expect(typeof comp).toBe('function');
+      expect(comp).not.toBe(mock);
+    });
+  }
 });
 
 describe('preloadSecondaryScreens — پیش‌بارگذاری idle', () => {

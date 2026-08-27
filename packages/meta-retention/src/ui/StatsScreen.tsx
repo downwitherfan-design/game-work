@@ -13,7 +13,7 @@ import { winRate } from '../stats';
 import { mosaicProgress, MAX_FREEZES } from '../streak';
 import { ACHIEVEMENTS } from '../achievements';
 import { buildMonthCalendar } from '../jalali';
-import { Button, ProgressRing, SHARED_CSS } from './kit-adapter';
+import { Button, SHARED_CSS } from './kit-adapter';
 import { MosaicTile } from './MosaicTile';
 
 export interface StatsScreenProps {

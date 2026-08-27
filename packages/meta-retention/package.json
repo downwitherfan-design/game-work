@@ -11,6 +11,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@dordaneh/contracts": "*"
+    "@dordaneh/contracts": "*",
+    "preact": "10.24.3"
   }
 }

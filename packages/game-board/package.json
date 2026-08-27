@@ -15,6 +15,7 @@
     "@dordaneh/contracts": "*",
     "@dordaneh/core-engine": "*",
     "@dordaneh/ui-kit": "*",
-    "@dordaneh/audio-haptics": "*"
+    "@dordaneh/audio-haptics": "*",
+    "preact": "10.24.3"
   }
 }

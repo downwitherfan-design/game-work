@@ -7,11 +7,11 @@ import type { ComponentType } from 'preact';
 import { useMemo } from 'preact/hooks';
 import * as uiKit from '@dordaneh/ui-kit';
 
-type UiKitConfetti = ComponentType<Record<string, never>>;
+/** کامپوننت Confetti پکیج ui-kit (AI-04) — پراپ `active` اجباری است */
+type UiKitConfetti = ComponentType<{ active: boolean }>;
+const kitExport = (uiKit as unknown as Record<string, unknown>)['Confetti'];
 const KitConfetti: UiKitConfetti | null =
-  typeof (uiKit as { Confetti?: UiKitConfetti }).Confetti === 'function'
-    ? ((uiKit as { Confetti?: UiKitConfetti }).Confetti as UiKitConfetti)
-    : null;
+  typeof kitExport === 'function' ? (kitExport as unknown as UiKitConfetti) : null;
 
 const COLORS = [
   'var(--dor-correct)',
@@ -29,7 +29,7 @@ function prand(i: number, salt: number): number {
 }
 
 export function Confetti() {
-  if (KitConfetti) return <KitConfetti />;
+  if (KitConfetti) return <KitConfetti active={true} />;
   const pieces = useMemo(
     () =>
       Array.from({ length: PIECES }, (_, i) => ({

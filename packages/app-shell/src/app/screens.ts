@@ -42,8 +42,13 @@ export const loadAlbumScreen = (): Promise<AnyComponent> =>
 export const loadDuelScreen = (): Promise<AnyComponent> =>
   resolve(() => import('@dordaneh/duel-mode'), 'DuelScreen', MockDuelScreen);
 
+/**
+ * فروشگاه: پکیج AI-11 به‌جای کامپوننت، `mountShopScreen(container, deps)` صادر
+ * می‌کند؛ `ShopScreenAdapter` آن را به کامپوننت Preact تبدیل می‌کند و خودش
+ * افت به mock را مدیریت می‌کند (اگر پکیج/export در دسترس نبود).
+ */
 export const loadShopScreen = (): Promise<AnyComponent> =>
-  resolve(() => import('@dordaneh/monetization'), 'ShopScreen', MockShopScreen);
+  resolve(() => import('./shop-adapter'), 'ShopScreenAdapter', MockShopScreen);
 
 /**
  * پیش‌بارگذاری هوشمند: پس از ورود به بازی روزانه، ماژول‌های stats/album

@@ -35,6 +35,8 @@ import type { ShellStorage } from '../core/storage';
 
 export interface ShellServices {
   engine: EngineApi;
+  /** واژه‌نامه‌ی تزریق‌شده در موتور — برای اعتبارسنجی حدس در UI و تست‌ها */
+  wordDb: WordDbApi;
   culture: CultureApi;
   audio: AudioApi;
   analytics: AnalyticsApi;
@@ -177,6 +179,7 @@ export function createServices(bus: EventBus, storage: ShellStorage): ShellServi
 
   return {
     engine: engine ?? createMockEngine(),
+    wordDb,
     culture: culture ?? createMockCulture(storage),
     audio: audio ?? createMockAudio(),
     analytics: analytics ?? createMockAnalytics(storage),
