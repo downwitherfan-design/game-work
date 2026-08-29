@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1280" preserveAspectRatio="xMidYMid slice" role="img" aria-label="بازار سنتی ایرانی">
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#7fc3e8"/>
+      <stop offset="40%" stop-color="#f4d89a"/>
+      <stop offset="75%" stop-color="#e5a56b"/>
+      <stop offset="100%" stop-color="#c48a4a"/>
+    </linearGradient>
+    <linearGradient id="dome" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#4db8b8"/>
+      <stop offset="50%" stop-color="#2a8f8f"/>
+      <stop offset="100%" stop-color="#1a5f5f"/>
+    </linearGradient>
+    <linearGradient id="dome2" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#e6a527"/>
+      <stop offset="100%" stop-color="#8b5a2b"/>
+    </linearGradient>
+    <linearGradient id="wall" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#d4a56b"/>
+      <stop offset="100%" stop-color="#8b5a2b"/>
+    </linearGradient>
+    <linearGradient id="ground" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#c48a4a"/>
+      <stop offset="100%" stop-color="#6b3f1a"/>
+    </linearGradient>
+    <radialGradient id="sunglow" cx="50%" cy="30%" r="40%">
+      <stop offset="0%" stop-color="#fff2c4" stop-opacity=".7"/>
+      <stop offset="100%" stop-color="#fff2c4" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="tiles" width="18" height="18" patternUnits="userSpaceOnUse">
+      <path d="M9 0 L18 9 L9 18 L0 9 Z" fill="#2a8f8f" opacity=".35"/>
+      <circle cx="9" cy="9" r="2" fill="#fbdc65"/>
+    </pattern>
+  </defs>
+
+  <!-- آسمان -->
+  <rect width="720" height="900" fill="url(#sky)"/>
+  <ellipse cx="360" cy="380" rx="320" ry="180" fill="url(#sunglow)"/>
+
+  <!-- ابرهای انتزاعی -->
+  <g fill="#fff" opacity=".55">
+    <ellipse cx="120" cy="180" rx="55" ry="14"/>
+    <ellipse cx="150" cy="170" rx="35" ry="11"/>
+    <ellipse cx="600" cy="140" rx="70" ry="16"/>
+    <ellipse cx="570" cy="130" rx="40" ry="12"/>
+  </g>
+
+  <!-- معماری دوردست: مسجد/بازار با گنبدهای فیروزه‌ای -->
+  <g>
+    <!-- دیوار پشت چپ -->
+    <rect x="0" y="620" width="200" height="280" fill="url(#wall)"/>
+    <path d="M0 620 L200 620 L200 600 Q100 570 0 600 Z" fill="#8b5a2b"/>
+    <!-- کمان‌های طاق -->
+    <path d="M30 900 L30 780 Q50 730 70 780 L70 900 Z" fill="#3a1f0c" opacity=".65"/>
+    <path d="M100 900 L100 780 Q120 730 140 780 L140 900 Z" fill="#3a1f0c" opacity=".65"/>
+
+    <!-- گنبد اصلی وسط (دور) -->
+    <ellipse cx="360" cy="720" rx="90" ry="85" fill="url(#dome)"/>
+    <ellipse cx="360" cy="720" rx="90" ry="85" fill="url(#tiles)"/>
+    <path d="M355 630 L360 605 L365 630 Z" fill="#fbdc65"/>
+    <circle cx="360" cy="605" r="6" fill="#fbdc65"/>
+    <rect x="270" y="720" width="180" height="180" fill="url(#wall)"/>
+    <!-- پنجره‌های طاقی رنگی -->
+    <path d="M295 900 L295 800 Q315 760 335 800 L335 900 Z" fill="#e6a527"/>
+    <path d="M300 895 L300 810 Q315 780 330 810 L330 895 Z" fill="#b83e2a" opacity=".8"/>
+    <path d="M385 900 L385 800 Q405 760 425 800 L425 900 Z" fill="#e6a527"/>
+    <path d="M390 895 L390 810 Q405 780 420 810 L420 895 Z" fill="#4d8f2c" opacity=".8"/>
+
+    <!-- گنبد کوچک راست -->
+    <ellipse cx="560" cy="770" rx="55" ry="50" fill="url(#dome2)"/>
+    <rect x="505" y="770" width="110" height="130" fill="url(#wall)"/>
+    <path d="M530 900 L530 830 Q545 800 560 830 L560 900 Z" fill="#3a1f0c" opacity=".6"/>
+
+    <!-- دیوار پشت راست -->
+    <rect x="615" y="680" width="105" height="220" fill="url(#wall)"/>
+    <path d="M615 680 L720 680 L720 660 Q670 640 615 660 Z" fill="#8b5a2b"/>
+  </g>
+
+  <!-- زمین -->
+  <rect x="0" y="900" width="720" height="380" fill="url(#ground)"/>
+  <!-- خطوط فرش -->
+  <g stroke="#5a3418" stroke-width="1" opacity=".4">
+    <line x1="0" y1="950" x2="720" y2="950"/>
+    <line x1="0" y1="1020" x2="720" y2="1020"/>
+    <line x1="0" y1="1100" x2="720" y2="1100"/>
+    <line x1="0" y1="1200" x2="720" y2="1200"/>
+  </g>
+
+  <!-- مه‌ی گرما (لایه مات) -->
+  <rect width="720" height="1280" fill="#fbdc65" opacity=".05"/>
+</svg>
