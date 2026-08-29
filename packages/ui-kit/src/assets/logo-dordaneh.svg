@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="دُردانه">
+  <defs>
+    <radialGradient id="pearl" cx="40%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#fff8ec"/>
+      <stop offset="40%" stop-color="#fbdc65"/>
+      <stop offset="100%" stop-color="#a0680f"/>
+    </radialGradient>
+    <linearGradient id="shell-top" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#4db8b8"/>
+      <stop offset="100%" stop-color="#1a5f5f"/>
+    </linearGradient>
+    <linearGradient id="shell-bottom" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#2a8f8f"/>
+      <stop offset="100%" stop-color="#0f3f3f"/>
+    </linearGradient>
+  </defs>
+  <!-- صدف بالا -->
+  <path d="M20 100 Q100 20 180 100 L160 100 Q100 45 40 100 Z" fill="url(#shell-top)"/>
+  <g stroke="#0f3f3f" stroke-width="1.5" fill="none" opacity=".55">
+    <path d="M40 100 Q100 40 160 100"/>
+    <path d="M55 100 Q100 55 145 100"/>
+    <path d="M70 100 Q100 70 130 100"/>
+  </g>
+  <!-- صدف پایین -->
+  <path d="M20 100 Q100 190 180 100 L160 100 Q100 165 40 100 Z" fill="url(#shell-bottom)"/>
+  <g stroke="#0a2a2a" stroke-width="1.5" fill="none" opacity=".55">
+    <path d="M40 100 Q100 165 160 100"/>
+    <path d="M55 100 Q100 145 145 100"/>
+  </g>
+  <!-- مروارید -->
+  <circle cx="100" cy="105" r="22" fill="url(#pearl)"/>
+  <circle cx="93" cy="98" r="6" fill="#fff" opacity=".7"/>
+  <!-- درخشش -->
+  <g fill="#fbdc65" opacity=".9">
+    <path d="M100 60 L102 78 L100 82 L98 78 Z"/>
+    <path d="M100 128 L102 132 L100 150 L98 132 Z"/>
+    <path d="M60 105 L78 103 L82 105 L78 107 Z"/>
+    <path d="M118 105 L122 103 L140 105 L122 107 Z"/>
+  </g>
+</svg>
