@@ -1,10 +1,11 @@
 /**
  * @dordaneh/ui-kit — توکن‌های طراحی (مالک: AI-04)
- * منبع واحد رنگ/فونت/فاصله طبق docs/02_CONTRACTS.md §4 — استفاده در همه‌ی UIها اجباری.
- * پالت «کاغذی روشن» + تم تیره [data-theme="dark"] + حالت کوررنگی [data-colorblind="true"].
+ * منبع واحد رنگ/فونت/فاصله — استفاده در همه‌ی UI‌ها اجباری.
+ * پالت «آمیرزا — حیاط گرم ایرانی» (RFC-0015)
+ * + تم تیره [data-dor-theme="dark"] + کوررنگی [data-dor-colorblind]
  */
 
-/* ---------- فونت Vazirmatn (subset فارسی + لاتین محدود، آفلاین-اول، بدون CDN) ---------- */
+/* ---------- فونت Vazirmatn (آفلاین‌اول، بدون CDN) ---------- */
 @font-face {
   font-family: 'Vazirmatn';
   font-style: normal;
@@ -20,110 +21,198 @@
   src: url('./fonts/Vazirmatn-Bold-sub.woff2') format('woff2');
 }
 
-/* ---------- توکن‌های قرارداد (مقادیر دقیق §4 — تغییر فقط با RFC) ---------- */
-:root {
-  --dor-bg: #f7f3e9;
-  --dor-correct: #4caf7d;
-  --dor-present: #e5a83b;
-  --dor-absent: #b7b0a3;
-  --dor-accent: #1ca9a6;
-  --dor-gold: #d4af37;
-  --dor-dark-bg: #1b2430;
-  --dor-dark-accent: #0e6e6b;
-  --dor-font: 'Vazirmatn', sans-serif;
-  --dor-radius: 12px;
+/* ================================================================
+   توکن‌های قرارداد (قفل) + مشتق — تم روشن (پیش‌فرض)
+   =============================================================== */
+:root,
+[data-dor-theme='light'] {
+  /* ---- قراردادی (تغییر فقط با RFC) ---- */
+  --dor-bg: #f4e8d0;              /* کرم گرم کاغذی */
+  --dor-correct: #4d8f2c;         /* سبز پسته‌ای */
+  --dor-present: #e6a527;         /* زرد طلایی */
+  --dor-absent: #6b4a2e;          /* قهوه‌ای تیره */
+  --dor-accent: #2a8f8f;          /* فیروزه‌ای گنبد */
+  --dor-gold: #d4a020;
+  --dor-dark-bg: #1a1008;
+  --dor-dark-accent: #4db8b8;
+
+  /* ---- تایپوگرافی ---- */
+  --dor-font: 'Vazirmatn', 'Estedad', 'IRANSans', system-ui, 'Tahoma', sans-serif;
+  --dor-font-display: 'Vazirmatn', system-ui, sans-serif;
+
+  /* ---- فاصله و شعاع ---- */
+  --dor-radius: 14px;
+  --dor-radius-1: 6px;
+  --dor-radius-2: 12px;
+  --dor-radius-3: 20px;
+  --dor-radius-round: 999px;
   --dor-space-1: 4px;
   --dor-space-2: 8px;
-  --dor-space-3: 16px;
-  --dor-space-4: 24px;
+  --dor-space-3: 12px;
+  --dor-space-4: 16px;
+  --dor-space-5: 24px;
+  --dor-space-6: 32px;
 
-  /* ---------- توکن‌های مشتق‌شده (سطح معنایی — ui-kit) ---------- */
-  --dor-ink: #1b2430; /* متن اصلی روی پس‌زمینه‌ی کاغذی (کنتراست ~14:1) */
-  --dor-ink-soft: #4c5462; /* متن ثانویه (کنتراست ≥ 4.5:1 روی --dor-bg) */
-  --dor-surface: #fffdf6; /* سطح کارت/مودال */
-  --dor-surface-2: #efe9da; /* سطح فرورفته (سوییچ خاموش، پس‌زمینه‌ی progress) */
-  --dor-border: #d9d2c2; /* خطوط ظریف */
-  --dor-tile-empty-border: #c9c1b0;
+  /* ---- متن و سطوح ---- */
+  --dor-ink: #3a2416;              /* متن اصلی — قهوه‌ای تیره برای RTL با رنگی گرم */
+  --dor-ink-soft: #6d4c2f;         /* متن ثانویه */
+  --dor-surface: #fbf3dc;          /* کارت‌ها، مودال‌ها */
+  --dor-surface-2: #efdcb2;        /* فرورفتگی */
+  --dor-border: #b89670;           /* خطوط */
+  --dor-tile-empty-border: #b89670;
 
-  /* متن روی خانه‌های رنگی — جوهر تیره روی هر سه رنگ AA را رد می‌کند */
-  --dor-on-correct: #1b2430;
-  --dor-on-present: #1b2430;
-  --dor-on-absent: #1b2430;
+  /* ---- متن روی حالات تایل (سبک آمیرزا = حرف طلایی) ---- */
+  --dor-on-correct: #ffffff;
+  --dor-on-present: #3a2416;
+  --dor-on-absent: #f4c247;        /* حرف طلایی روی زمینه‌ی تیره */
+  --dor-on-tile-empty: #6d4c2f;
 
-  /* دکمه‌ی اصلی: تِیل تیره + متن سفید (کنتراست ~6:1، AA normal) */
-  --dor-btn-bg: var(--dor-dark-accent);
-  --dor-btn-fg: #ffffff;
-  --dor-btn-secondary-fg: #0b5a58; /* متن دکمه‌ی ثانویه روی کاغذ (AA) */
+  /* ---- دکمه‌های اصلی (گنبدی) ---- */
+  --dor-btn-bg: #ec7823;           /* نارنجی طلایی */
+  --dor-btn-fg: #fff8ec;
+  --dor-btn-secondary-fg: #4d8f2c;
 
-  --dor-danger: #b3403a; /* خطا/باخت (AA روی کاغذ با متن سفید) */
+  --dor-danger: #b83e2a;
   --dor-on-danger: #ffffff;
-  --dor-on-gold: #1b2430;
+  --dor-on-gold: #2b1a08;
 
-  --dor-shadow-1: 0 1px 3px rgba(27, 36, 48, 0.1);
-  --dor-shadow-2: 0 6px 20px rgba(27, 36, 48, 0.14);
-  --dor-focus-ring: 0 0 0 3px rgba(28, 169, 166, 0.45);
+  /* ---- سایه‌ها ---- */
+  --dor-shadow-1: 0 1px 3px rgba(60, 30, 10, 0.15);
+  --dor-shadow-2: 0 6px 20px rgba(60, 30, 10, 0.25);
+  --dor-shadow-3: 0 10px 30px rgba(60, 30, 10, 0.35);
+  --dor-focus-ring: 0 0 0 3px rgba(217, 119, 6, 0.55);
 
-  /* حالت کوررنگی: پیش‌فرض = همان رنگ‌های استاندارد */
-  --dor-cb: 0; /* فلگ تشخیصی برای تست/دیباگ */
+  /* ---- لمس و انیمیشن ---- */
+  --dor-touch-min: 48px;
+  --dor-anim-pop: 120ms;
+  --dor-anim-flip: 500ms;
+  --dor-anim-stagger: 250ms;
+  --dor-flip-delay: 180ms;
+  --dor-duration-1: 120ms;
+  --dor-duration-2: 240ms;
+  --dor-duration-3: 400ms;
+  --dor-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --dor-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---- کوررنگی ---- */
+  --dor-cb: 0;
   --dor-cb-correct: var(--dor-correct);
   --dor-cb-present: var(--dor-present);
 
-  /* ناحیه‌ی لمس (Apple HIG / قانون فیتس) */
-  --dor-touch-min: 44px;
-
-  /* زمان‌بندی انیمیشن */
-  --dor-anim-pop: 110ms;
-  --dor-anim-flip: 500ms;
-  --dor-anim-stagger: 250ms;
-
   color-scheme: light;
+
+  /* ================================================================
+     توکن‌های مشتق سبک «آمیرزا» (RFC-0015)
+     =============================================================== */
+
+  /* --- گرادیان کاشی چوبی سه‌بعدی --- */
+  --dor-wood-tile: linear-gradient(160deg, #7a4c26 0%, #5c3418 45%, #3a1f0c 100%);
+  --dor-wood-tile-hi: linear-gradient(160deg, #8f5a2f 0%, #6d3f1e 100%);
+  --dor-wood-plank: linear-gradient(180deg, #8b5a2b 0%, #6d4220 50%, #5a3418 100%);
+  --dor-wood-dark: linear-gradient(180deg, #5c3418 0%, #3a1f0c 100%);
+  --dor-gold-face: linear-gradient(180deg, #fbdc65 0%, #e9b224 45%, #a0680f 100%);
+  --dor-gold-shine: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0) 55%);
+
+  /* --- گرادیان حالات تایل --- */
+  --dor-tile-correct-face: linear-gradient(180deg, #6bb03d 0%, #4d8f2c 55%, #2e6416 100%);
+  --dor-tile-correct-edge: #1f4a0d;
+  --dor-tile-present-face: linear-gradient(180deg, #f4c247 0%, #e6a527 55%, #a56f11 100%);
+  --dor-tile-present-edge: #7a4f08;
+  --dor-tile-absent-face: linear-gradient(180deg, #8a6a4e 0%, #6b4a2e 55%, #46301a 100%);
+  --dor-tile-absent-edge: #2a1a0a;
+  --dor-tile-empty-face: linear-gradient(180deg, #fbf3dc 0%, #efdcb2 100%);
+
+  /* --- دکمه‌های گنبدی --- */
+  --dor-btn-orange: linear-gradient(180deg, #fbb040 0%, #ec7823 50%, #b04d0f 100%);
+  --dor-btn-orange-edge: #7a3608;
+  --dor-btn-green: linear-gradient(180deg, #7cc846 0%, #4d8f2c 50%, #2b5f12 100%);
+  --dor-btn-green-edge: #1f4a0d;
+  --dor-btn-red: linear-gradient(180deg, #e5654c 0%, #b83e2a 50%, #7a2410 100%);
+  --dor-btn-red-edge: #5a1a08;
+  --dor-btn-gold: linear-gradient(180deg, #fbdc65 0%, #d4a020 55%, #8a6a08 100%);
+  --dor-btn-gold-edge: #5a4508;
+
+  /* --- بنر ریبون --- */
+  --dor-ribbon: linear-gradient(180deg, #b83e2a 0%, #8a2010 100%);
+  --dor-ribbon-shine: linear-gradient(180deg, rgba(255,255,255,.3), rgba(255,255,255,0) 60%);
+
+  /* --- صحنه‌ی ایرانی --- */
+  --dor-scene-sky: linear-gradient(180deg, #7fc3e8 0%, #a8d8ee 40%, #f4e0b0 75%, #d4a56b 100%);
+  --dor-scene-ground: linear-gradient(180deg, #c48a4a 0%, #8b5a2b 100%);
+
+  /* --- کارت فرهنگی --- */
+  --dor-card-paper: linear-gradient(180deg, #fbf3dc 0%, #f0e0b8 100%);
+  --dor-card-border: #a56f11;
+
+  /* --- سایه‌های سه‌بعدی --- */
+  --dor-tile-shadow: 0 4px 0 var(--dor-tile-absent-edge), 0 6px 10px rgba(0,0,0,.35), inset 0 2px 0 rgba(255,255,255,.25);
+  --dor-btn-shadow: 0 5px 0 var(--dor-btn-orange-edge), 0 8px 14px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.35);
+  --dor-inset-gold: inset 0 2px 0 rgba(255,255,255,.5), inset 0 -3px 0 rgba(0,0,0,.25);
 }
 
-/* ---------- تم تیره ---------- */
+/* ================================================================
+   تم تیره
+   =============================================================== */
+[data-dor-theme='dark'],
 [data-theme='dark'] {
-  --dor-bg: var(--dor-dark-bg);
-  --dor-ink: #f1eadb;
-  --dor-ink-soft: #b6bdc9;
-  --dor-surface: #232e3d;
-  --dor-surface-2: #2c3949;
-  --dor-border: #3a4759;
-  --dor-tile-empty-border: #465364;
+  --dor-bg: #1a1008;
+  --dor-ink: #f4e8d0;
+  --dor-ink-soft: #a08770;
+  --dor-surface: #24160a;
+  --dor-surface-2: #3a2416;
+  --dor-border: #5c3418;
+  --dor-tile-empty-border: #5c3418;
+  --dor-btn-bg: #f4a028;
+  --dor-btn-fg: #1a1008;
+  --dor-btn-secondary-fg: #6ac33a;
+  --dor-on-correct: #ffffff;
+  --dor-on-present: #1a1008;
+  --dor-on-absent: #f4c247;
+  --dor-on-tile-empty: #a08770;
 
-  /* در تم تیره دکمه‌ی اصلی = فیروزه‌ای روشن + جوهر تیره (AA) */
-  --dor-btn-bg: var(--dor-accent);
-  --dor-btn-fg: #10201f;
-  --dor-btn-secondary-fg: #6fd3d0;
-
-  --dor-danger: #e2726c;
-  --dor-on-danger: #2a100e;
-
-  --dor-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --dor-shadow-2: 0 6px 20px rgba(0, 0, 0, 0.5);
-  --dor-focus-ring: 0 0 0 3px rgba(28, 169, 166, 0.6);
+  --dor-tile-empty-face: linear-gradient(180deg, #3a2416 0%, #24160a 100%);
+  --dor-scene-sky: linear-gradient(180deg, #0f1a2e 0%, #1a2340 40%, #3a2416 75%, #1a1008 100%);
+  --dor-card-paper: linear-gradient(180deg, #3a2416 0%, #24160a 100%);
 
   color-scheme: dark;
 }
 
-/* ---------- حالت کوررنگی (~۸٪ مردان — Birch 2001؛ الگوی Wordle) ----------
- * سبز/کهربایی → آبی/نارنجیِ متمایز + الگوی شکل روی Tile (نقطه/خط در ui-kit.css)
- */
+/* ================================================================
+   کوررنگی
+   =============================================================== */
+[data-dor-colorblind='deutan'],
 [data-colorblind='true'] {
   --dor-cb: 1;
-  --dor-cb-correct: #1e5fc2; /* آبی — متن سفید AA (~6:1) */
-  --dor-cb-present: #e07a2e; /* نارنجی — جوهر تیره AA (~5:1) */
-  --dor-correct: var(--dor-cb-correct);
-  --dor-present: var(--dor-cb-present);
-  --dor-on-correct: #ffffff;
-  --dor-on-present: #1b2430;
+  --dor-correct: #2578d6;
+  --dor-cb-correct: #2578d6;
+  --dor-tile-correct-face: linear-gradient(180deg, #4a9ce8 0%, #2578d6 55%, #124588 100%);
+  --dor-tile-correct-edge: #0a2f5c;
+  --dor-btn-green: linear-gradient(180deg, #4a9ce8 0%, #2578d6 50%, #124588 100%);
+  --dor-btn-green-edge: #0a2f5c;
 }
 
-[data-theme='dark'][data-colorblind='true'] {
-  --dor-on-present: #1b2430;
+[data-dor-colorblind='protan'] {
+  --dor-cb: 1;
+  --dor-correct: #1e88c8;
+  --dor-cb-correct: #1e88c8;
+  --dor-tile-correct-face: linear-gradient(180deg, #3fa3d8 0%, #1e88c8 55%, #0e5080 100%);
+  --dor-tile-correct-edge: #082c48;
+  --dor-btn-green: linear-gradient(180deg, #3fa3d8 0%, #1e88c8 50%, #0e5080 100%);
+  --dor-btn-green-edge: #082c48;
 }
 
-/* ---------- پایه ---------- */
-.dor-root,
 [data-dor] {
   font-family: var(--dor-font);
   direction: rtl;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dor-anim-pop: 0ms;
+    --dor-anim-flip: 0ms;
+    --dor-anim-stagger: 0ms;
+    --dor-duration-1: 0ms;
+    --dor-duration-2: 0ms;
+    --dor-duration-3: 0ms;
+  }
 }

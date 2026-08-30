@@ -1,16 +1,53 @@
 /*
- * استایل ساختاری پوسته — فقط layout/چیدمان.
- * رنگ/فونت/فاصله فقط از CSS variables قرارداد §4 (خط قرمز ۲۵).
- * RTL-first با خصوصیات logical (خط قرمز ۲۴).
+ * @dordaneh/app-shell — استایل پوسته (مالک: AI-05 → واگذار به AI-04 برای RFC-0015)
+ * سبک بصری: آمیرزا — پس‌زمینه‌ی صحنه‌ی بازار سنتی + هدر ریبون + ناوبری چوبی.
+ * RTL-first با خصوصیات logical، بدون hardcode رنگ (همه از توکن‌های ui-kit).
  */
+
 html,
 body {
   margin: 0;
   padding: 0;
   background: var(--dor-bg);
-  color: var(--dor-fg, inherit);
+  color: var(--dor-ink, inherit);
   font-family: var(--dor-font);
   min-height: 100dvh;
+  overscroll-behavior: none;
+}
+
+body {
+  background:
+    var(--dor-scene-sky);
+  background-attachment: fixed;
+}
+
+/* پس‌زمینه‌ی صحنه‌ی بازار — لایه‌ی SVG ثابت پشت همه صفحات */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/assets/scene-bazaar.svg');
+  background-size: cover;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* حجاب گرم روی صحنه برای خوانایی بهتر متن */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(244, 232, 208, 0.0) 0%,
+    rgba(244, 232, 208, 0.3) 60%,
+    rgba(244, 232, 208, 0.7) 100%
+  );
+  z-index: -1;
+  pointer-events: none;
 }
 
 #app-shell {
@@ -19,287 +56,465 @@ body {
   min-height: 100dvh;
   max-inline-size: 560px;
   margin-inline: auto;
+  position: relative;
 }
 
+/* هدر ریبون — استایل کامل در ui-kit.css (dor-topbar) هست
+   این‌جا فقط تنظیمات layout در shell */
 .dor-topbar {
-  padding-block: var(--dor-space-2);
-  padding-inline: var(--dor-space-3);
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 10;
+  padding-block: var(--dor-space-3);
+  padding-inline: var(--dor-space-5);
   text-align: center;
+  background: var(--dor-ribbon);
+  color: #fff8ec;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+  overflow: visible;
+  isolation: isolate;
+}
+.dor-topbar::before,
+.dor-topbar::after {
+  content: '';
+  position: absolute;
+  inset-block: 8px;
+  inline-size: 24px;
+  background: var(--dor-ribbon);
+  filter: brightness(0.65);
+  z-index: -1;
+}
+.dor-topbar::before {
+  inset-inline-start: -12px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 45% 50%);
+}
+.dor-topbar::after {
+  inset-inline-end: -12px;
+  clip-path: polygon(0 0, 100% 0, 55% 50%, 100% 100%, 0 100%);
 }
 
 .dor-logo {
   margin: 0;
-  font-size: 1.4rem;
-  color: var(--dor-accent);
+  font-family: var(--dor-font-display);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #fff8ec;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.25);
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dor-space-2);
+}
+.dor-logo::before {
+  content: '';
+  display: inline-block;
+  inline-size: 32px;
+  block-size: 32px;
+  background: url('/assets/logo-dordaneh.svg') center / contain no-repeat;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
 }
 
 #main-outlet {
   flex: 1;
-  padding-inline: var(--dor-space-3);
-  padding-block-end: calc(var(--dor-space-4) * 3);
+  padding-inline: var(--dor-space-4);
+  padding-block: var(--dor-space-4);
+  padding-block-end: calc(var(--dor-space-6) + 76px);
+  position: relative;
+  z-index: 1;
 }
 
 .dor-screen h2 {
-  margin-block: var(--dor-space-3);
+  margin: 0 0 var(--dor-space-4);
+  font-family: var(--dor-font-display);
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--dor-ink);
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-/* ناوبری پایین */
+/* ================= ناوبری پایین چوبی ================= */
 .dor-bottom-nav {
   position: fixed;
   inset-block-end: 0;
   inset-inline: 0;
   display: flex;
   justify-content: space-around;
+  align-items: stretch;
   padding-block: var(--dor-space-2);
   padding-block-end: calc(var(--dor-space-2) + env(safe-area-inset-bottom, 0px));
-  background: var(--dor-surface, var(--dor-bg));
-  border-start-start-radius: var(--dor-radius);
-  border-start-end-radius: var(--dor-radius);
-  box-shadow: 0 -2px 12px rgb(0 0 0 / 8%);
+  padding-inline: var(--dor-space-2);
+  background: var(--dor-wood-plank);
+  border-block-start: 3px solid var(--dor-btn-orange-edge);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.4),
+    0 -6px 16px rgba(0, 0, 0, 0.3);
   max-inline-size: 560px;
   margin-inline: auto;
+  z-index: 20;
+}
+.dor-bottom-nav::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 6px;
+  block-size: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.25) 0 2px,
+    transparent 2px 14px
+  );
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .dor-bottom-nav a {
+  flex: 1;
   position: relative;
   text-decoration: none;
-  color: var(--dor-absent);
-  font-size: 0.85rem;
-  padding-block: var(--dor-space-1);
-  padding-inline: var(--dor-space-2);
-  border-radius: var(--dor-radius);
-  transition: color 120ms ease;
-}
-
-.dor-bottom-nav a.active {
-  color: var(--dor-accent);
+  color: rgba(255, 248, 236, 0.75);
+  font-size: 0.8rem;
   font-weight: 700;
+  padding-block: var(--dor-space-3) var(--dor-space-2);
+  padding-inline: var(--dor-space-2);
+  border-radius: var(--dor-radius-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  transition:
+    color var(--dor-anim-pop) ease,
+    background var(--dor-anim-pop) ease,
+    transform var(--dor-anim-pop) ease;
+  -webkit-tap-highlight-color: transparent;
+  min-block-size: var(--dor-touch-min);
+}
+.dor-bottom-nav a:active {
+  transform: scale(0.94);
+}
+.dor-bottom-nav a.active {
+  color: #fff8ec;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  box-shadow:
+    inset 0 -4px 0 var(--dor-gold),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.5),
+    0 0 8px rgba(212, 160, 32, 0.5);
 }
 
-/* بج زایگارنیک آلبوم */
+/* ================= بج زایگارنیک آلبوم (نشان جدید بودن) ================= */
 .dor-badge {
   position: absolute;
-  inset-block-start: -4px;
-  inset-inline-end: -6px;
-  display: inline-grid;
-  place-items: center;
-  min-inline-size: 16px;
-  block-size: 16px;
-  font-size: 0.65rem;
-  border-radius: 999px;
-  background: var(--dor-gold);
-  color: var(--dor-dark-bg);
+  inset-block-start: 4px;
+  inset-inline-end: 8px;
+  min-inline-size: 18px;
+  block-size: 18px;
+  padding-inline: 5px;
+  border-radius: var(--dor-radius-round);
+  background: var(--dor-btn-red);
+  color: #fff8ec;
+  font-size: 0.7rem;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* دکمه‌ی اصلی */
-.dor-primary {
-  display: inline-block;
-  border: 0;
-  cursor: pointer;
-  background: var(--dor-accent);
-  color: var(--dor-bg);
-  font-family: var(--dor-font);
-  font-size: 1rem;
-  padding-block: var(--dor-space-2);
-  padding-inline: var(--dor-space-4);
-  border-radius: var(--dor-radius);
-  text-decoration: none;
-}
-
-/* آنبوردینگ */
+/* ================= صفحه‌ی onboarding ================= */
 .dor-onboarding {
-  padding: var(--dor-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--dor-space-5);
+  padding-block: var(--dor-space-5);
+  text-align: center;
+}
+.dor-onboarding h1 {
+  font-family: var(--dor-font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 0;
+  color: var(--dor-ink);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.6);
+}
+.dor-onboarding p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--dor-ink-soft);
+  margin: 0;
+}
+.dor-primary,
+.dor-onboarding .dor-primary {
+  align-self: center;
+  min-inline-size: 200px;
+}
+
+/* یادداشت اسکلت (فقط dev) */
+.dor-mock-note {
+  padding: var(--dor-space-3);
+  background: rgba(230, 165, 39, 0.15);
+  border: 1px dashed var(--dor-present);
+  border-radius: var(--dor-radius-2);
+  font-size: 0.85rem;
+  color: var(--dor-ink-soft);
   text-align: center;
 }
 
-.dor-tooltip {
-  background: var(--dor-surface, var(--dor-bg));
-  border-inline-start: 3px solid var(--dor-accent);
-  padding: var(--dor-space-2) var(--dor-space-3);
-  margin-block: var(--dor-space-2);
-  border-radius: var(--dor-radius);
-  font-size: 0.9rem;
-  text-align: start;
-}
-
-.dor-peak-end {
-  font-weight: 700;
-  color: var(--dor-gold);
-}
-
-/* کارت فرهنگی */
-.dor-card {
-  display: block;
-  background: var(--dor-surface, var(--dor-bg));
-  border-radius: var(--dor-radius);
-  padding: var(--dor-space-3);
-  margin-block: var(--dor-space-3);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
-}
-
-.dor-card small {
-  color: var(--dor-absent);
-}
-
-/* برد mock */
-.dor-board {
-  display: flex;
-  flex-direction: column;
-  gap: var(--dor-space-1);
-  margin-block: var(--dor-space-3);
-}
-
-.dor-row {
-  display: flex;
-  gap: var(--dor-space-1);
-  justify-content: center;
-}
-
+/* ================= tile در تخته shell (fallback ساده) ================= */
 .dor-tile {
-  display: inline-grid;
-  place-items: center;
-  inline-size: 44px;
-  block-size: 44px;
-  border-radius: var(--dor-radius);
-  background: var(--dor-surface, var(--dor-bg));
-  font-weight: 700;
-  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 52px;
+  block-size: 52px;
+  border-radius: 10px;
+  font-family: var(--dor-font-display);
+  font-size: 1.6rem;
+  font-weight: 900;
+  background: var(--dor-tile-empty-face);
+  color: var(--dor-on-tile-empty);
+  border: 2px solid var(--dor-tile-empty-border);
+  box-shadow:
+    inset 0 -3px 0 rgba(0, 0, 0, 0.1),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
 }
-
 .dor-tile[data-state='correct'] {
-  background: var(--dor-correct);
-  color: #fff;
+  background: var(--dor-tile-correct-face);
+  color: var(--dor-on-correct);
+  border-color: transparent;
+  box-shadow:
+    inset 0 -4px 0 var(--dor-tile-correct-edge),
+    inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
 }
-
 .dor-tile[data-state='present'] {
-  background: var(--dor-present);
-  color: #fff;
+  background: var(--dor-tile-present-face);
+  color: var(--dor-on-present);
+  border-color: transparent;
+  box-shadow:
+    inset 0 -4px 0 var(--dor-tile-present-edge),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
 }
-
 .dor-tile[data-state='absent'] {
-  background: var(--dor-absent);
-  color: #fff;
+  background: var(--dor-tile-absent-face);
+  color: var(--dor-on-absent);
+  border-color: transparent;
+  box-shadow:
+    inset 0 -4px 0 var(--dor-tile-absent-edge),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25);
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.5),
+    0 3px 6px rgba(0, 0, 0, 0.3);
 }
 
-.dor-guess-form {
+.dor-board {
+  display: grid;
+  gap: var(--dor-space-2);
+  justify-content: center;
+  margin-block: var(--dor-space-4);
+}
+.dor-row {
   display: flex;
   gap: var(--dor-space-2);
   justify-content: center;
 }
 
+/* ================= فرم حدس (fallback shell) ================= */
+.dor-guess-form {
+  display: flex;
+  gap: var(--dor-space-2);
+  margin-block: var(--dor-space-4);
+  padding: var(--dor-space-3);
+  background: var(--dor-surface);
+  border-radius: var(--dor-radius-3);
+  box-shadow: var(--dor-shadow-2);
+  border: 2px solid var(--dor-border);
+}
 .dor-guess-form input {
+  flex: 1;
+  padding: var(--dor-space-3);
+  border: 2px solid var(--dor-border);
+  border-radius: var(--dor-radius-2);
   font-family: var(--dor-font);
   font-size: 1.1rem;
-  padding: var(--dor-space-2);
-  border-radius: var(--dor-radius);
-  border: 1px solid var(--dor-absent);
-  background: var(--dor-surface, var(--dor-bg));
-  color: inherit;
+  font-weight: 700;
+  color: var(--dor-ink);
+  background: var(--dor-bg);
   text-align: center;
+  min-block-size: var(--dor-touch-min);
 }
-
+.dor-guess-form input:focus {
+  outline: none;
+  border-color: var(--dor-btn-orange);
+  box-shadow: var(--dor-focus-ring);
+}
 .dor-guess-form button {
+  min-inline-size: var(--dor-touch-min);
+  padding-inline: var(--dor-space-4);
   font-family: var(--dor-font);
-  border: 0;
-  border-radius: var(--dor-radius);
-  background: var(--dor-accent);
-  color: var(--dor-bg);
-  padding-inline: var(--dor-space-3);
+  font-weight: 800;
+  font-size: 1rem;
+  color: #fff8ec;
+  background: var(--dor-btn-green);
+  border: none;
+  border-radius: var(--dor-radius-2);
   cursor: pointer;
+  box-shadow:
+    0 4px 0 var(--dor-btn-green-edge),
+    0 6px 10px rgba(0, 0, 0, 0.25),
+    inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+  transition: transform var(--dor-anim-pop) ease, box-shadow var(--dor-anim-pop) ease;
+}
+.dor-guess-form button:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 var(--dor-btn-green-edge),
+    0 2px 4px rgba(0, 0, 0, 0.25),
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
 }
 
-/* تنظیمات */
+/* ================= کارت فرهنگی (peak-end) ================= */
+.dor-peak-end,
+.dor-card {
+  position: relative;
+  margin-block: var(--dor-space-4);
+  padding: var(--dor-space-5) var(--dor-space-4);
+  background: var(--dor-card-paper);
+  color: var(--dor-ink);
+  border-radius: var(--dor-radius-3);
+  box-shadow:
+    var(--dor-shadow-3),
+    inset 0 0 0 3px var(--dor-card-border),
+    inset 0 0 0 5px var(--dor-surface),
+    inset 0 0 0 6px var(--dor-card-border);
+  overflow: hidden;
+}
+.dor-card small {
+  display: block;
+  margin-block-start: var(--dor-space-3);
+  padding-block-start: var(--dor-space-3);
+  border-block-start: 1px dashed var(--dor-card-border);
+  font-size: 0.85rem;
+  color: var(--dor-ink-soft);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ================= لیست آلبوم ================= */
+.dor-album-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--dor-space-3);
+}
+
+/* ================= تنظیمات ================= */
 .dor-settings-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--dor-space-3);
-  padding-block: var(--dor-space-3);
-  border-block-end: 1px solid rgb(0 0 0 / 8%);
+  padding: var(--dor-space-4);
+  margin-block-end: var(--dor-space-3);
+  background: var(--dor-surface);
+  border-radius: var(--dor-radius-2);
+  box-shadow: var(--dor-shadow-1);
+  border-inline-start: 4px solid var(--dor-accent);
 }
-
 .dor-settings-label {
+  font-weight: 700;
+  color: var(--dor-ink);
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
-
 .dor-settings-label small {
-  color: var(--dor-absent);
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--dor-ink-soft);
 }
 
+/* segmented control */
 .dor-segmented {
-  display: flex;
-  gap: var(--dor-space-1);
+  display: inline-flex;
+  padding: 4px;
+  background: var(--dor-surface-2);
+  border-radius: var(--dor-radius-round);
+  gap: 2px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
 }
-
 .dor-segmented button {
-  font-family: var(--dor-font);
-  border: 1px solid var(--dor-absent);
+  min-inline-size: 60px;
+  min-block-size: var(--dor-touch-min);
+  padding-inline: var(--dor-space-3);
+  border: none;
   background: transparent;
-  color: inherit;
-  padding-block: var(--dor-space-1);
-  padding-inline: var(--dor-space-2);
-  border-radius: var(--dor-radius);
+  border-radius: var(--dor-radius-round);
+  font-family: var(--dor-font);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--dor-ink-soft);
   cursor: pointer;
+  transition: all var(--dor-anim-pop) ease;
 }
-
 .dor-segmented button[aria-checked='true'] {
-  background: var(--dor-accent);
-  border-color: var(--dor-accent);
-  color: var(--dor-bg);
+  background: var(--dor-btn-orange);
+  color: #fff8ec;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
 }
 
+/* ================= صفحه درباره / حریم خصوصی ================= */
 .dor-about,
 .dor-privacy {
-  margin-block: var(--dor-space-3);
+  padding: var(--dor-space-4);
+  background: var(--dor-surface);
+  border-radius: var(--dor-radius-3);
+  box-shadow: var(--dor-shadow-2);
+  color: var(--dor-ink);
+  line-height: 1.8;
 }
 
-/* بنر بازیابی جلسه */
+/* ================= پیوند ادامه (resume) ================= */
 .dor-resume {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--dor-surface, var(--dor-bg));
-  border-inline-start: 3px solid var(--dor-gold);
-  padding: var(--dor-space-2) var(--dor-space-3);
-  border-radius: var(--dor-radius);
-  margin-block: var(--dor-space-2);
+  padding: var(--dor-space-4);
+  background: linear-gradient(180deg, var(--dor-surface) 0%, var(--dor-surface-2) 100%);
+  border-radius: var(--dor-radius-3);
+  border: 2px solid var(--dor-gold);
+  box-shadow: var(--dor-shadow-2), 0 0 20px rgba(212, 160, 32, 0.25);
+  text-align: center;
+  margin-block: var(--dor-space-4);
 }
-
 .dor-resume a {
-  color: var(--dor-accent);
-  font-weight: 700;
+  color: var(--dor-danger);
+  font-weight: 800;
   text-decoration: none;
+  padding-inline: var(--dor-space-2);
+}
+.dor-resume a:hover {
+  text-decoration: underline;
 }
 
-.dor-mock-note {
-  font-size: 0.8rem;
-  color: var(--dor-absent);
-}
-
-.dor-album-list {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--dor-space-2);
-}
-
-/* انیمیشن‌ها فقط با transform/opacity (خط قرمز ۲۷) */
-@media (prefers-reduced-motion: no-preference) {
-  .dor-screen {
-    animation: dor-fade-in 180ms ease;
-  }
-
-  @keyframes dor-fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  body::after {
+    animation: none;
   }
 }
