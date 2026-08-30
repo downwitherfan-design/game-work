@@ -77,6 +77,9 @@ export async function bootstrap(opts: BootOptions): Promise<void> {
     return;
   }
   render(<Root ctx={{ bus, storage, theme, services, orchestrator }} initial={settings} />, mount);
+  // splash را مخفی کن تا UI واقعی دیده شود (RFC-0015)
+  const w = globalThis as { __hideSplash?: () => void };
+  if (typeof w.__hideSplash === "function") w.__hideSplash();
 
   if (opts.registerSw !== false && 'serviceWorker' in navigator) {
     try {
