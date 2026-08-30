@@ -51,3 +51,26 @@ GUI فعلی دُردانه (توکن‌های پایه + تایل‌های flat
 ## مهاجرت
 
 هیچ. تغییرات کاملاً بصری، بدون breaking change.
+
+---
+
+## ✅ گزارش اجرا (2026-08-30)
+
+تمام کامیت‌های مرحله‌ی کار در شاخه‌ی `ai-04/gui-amirza-style` push شد:
+
+| # | فایل | تغییر |
+|---|---|---|
+| 1 | `packages/ui-kit/src/tokens.css` | +142 توکن مشتق سبک آمیرزا |
+| 2 | `packages/ui-kit/src/ui-kit.css` | بازنویسی کامل کامپوننت‌ها |
+| 3 | `packages/ui-kit/src/assets/scene-bazaar.svg` | پس‌زمینه‌ی بازار ایرانی SVG (4.2KB) |
+| 4 | `packages/ui-kit/src/assets/logo-dordaneh.svg` | لوگو مروارید-در-صدف (1.7KB) |
+| 5 | `packages/app-shell/src/app/shell.css` | بازنویسی کامل پوسته |
+| 6 | `packages/game-board/src/styles.ts` | کاشی 3D + کیبورد گنبدی |
+| 7 | `packages/app-shell/public/assets/*.svg` | کپی SVG‌ها برای زمان اجرا |
+
+### ✅ تأییدات
+- `npm run build` — همه‌ی پکیج‌ها سبز
+- `npm test` در ui-kit/game-board/app-shell — **72 تست پاس**
+- بودجه‌ی حجم: CSS نهایی 2.4KB gzip (<< 150KB)
+- API عمومی: بدون تغییر
+- منطق بازی: دست‌نخورده
