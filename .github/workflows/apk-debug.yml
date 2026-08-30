@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - uses: actions/setup-java@v4
@@ -31,14 +31,14 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: راه‌اندازی Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: نصب وابستگی‌ها
         run: npm install
 
       - name: ساخت باندل وب
         run: npm run build:app
-
-      - name: پیش‌نیاز تولید آیکون (تبدیل فونت وزیرمتن woff2 → ttf)
-        run: pip install --quiet fonttools brotli
 
       - name: افزودن پلتفرم اندروید و sync کاپاسیتور
         working-directory: native
