@@ -3,13 +3,93 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#1ABC9C" />
+    <meta name="theme-color" content="#b83e2a" />
     <title>دُردانه — معمای کلمات فارسی</title>
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" type="image/svg+xml" href="/assets/logo-dordaneh.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+    <style>
+      /* Splash اولیه — در حالی که JS بارگذاری می‌شود */
+      html,body{margin:0;padding:0;height:100%;background:#f4e8d0;font-family:'Vazirmatn','Tahoma',sans-serif;color:#3a2416}
+      #splash{
+        position:fixed;inset:0;z-index:9999;
+        background:
+          radial-gradient(ellipse at 50% 30%, #fff2c4 0%, #f4d89a 40%, #e5a56b 75%, #b83e2a 100%);
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        gap:24px;
+        transition:opacity 400ms ease, visibility 400ms;
+      }
+      #splash.hidden{opacity:0;visibility:hidden;pointer-events:none}
+      #splash-logo{
+        width:120px;height:120px;
+        filter:drop-shadow(0 8px 20px rgba(0,0,0,.35));
+        animation:splash-float 2.4s ease-in-out infinite;
+      }
+      #splash-title{
+        font-family:'Vazirmatn','Tahoma',sans-serif;
+        font-size:2.5rem;font-weight:900;color:#fff8ec;margin:0;
+        text-shadow:0 3px 0 rgba(0,0,0,.4),0 6px 12px rgba(0,0,0,.25);
+        letter-spacing:.02em;
+        animation:splash-in 800ms ease-out both;
+      }
+      #splash-tag{
+        font-size:1.05rem;color:#fff8ec;opacity:.85;margin:0;
+        text-shadow:0 2px 0 rgba(0,0,0,.3);
+        animation:splash-in 800ms 200ms ease-out both;
+      }
+      #splash-loader{
+        margin-top:20px;
+        width:180px;height:8px;border-radius:99px;
+        background:rgba(0,0,0,.25);
+        overflow:hidden;
+        box-shadow:inset 0 2px 4px rgba(0,0,0,.3);
+      }
+      #splash-loader::before{
+        content:'';display:block;height:100%;width:40%;
+        background:linear-gradient(90deg,#fbdc65,#d4a020,#fbdc65);
+        border-radius:99px;
+        box-shadow:0 0 12px rgba(212,160,32,.6);
+        animation:splash-loader 1.2s ease-in-out infinite;
+      }
+      @keyframes splash-float{
+        0%,100%{transform:translateY(0) rotate(-2deg)}
+        50%{transform:translateY(-8px) rotate(2deg)}
+      }
+      @keyframes splash-in{
+        from{opacity:0;transform:translateY(20px)}
+        to{opacity:1;transform:translateY(0)}
+      }
+      @keyframes splash-loader{
+        0%{transform:translateX(250%)}
+        100%{transform:translateX(-100%)}
+      }
+      @media (prefers-reduced-motion:reduce){
+        #splash-logo,#splash-title,#splash-tag,#splash-loader::before{animation:none}
+      }
+    </style>
   </head>
   <body>
+    <div id="splash" aria-hidden="false" role="status" aria-live="polite">
+      <img id="splash-logo" src="/assets/logo-dordaneh.svg" alt="دُردانه" />
+      <h1 id="splash-title">دُردانه</h1>
+      <p id="splash-tag">معمای کلمات فارسی</p>
+      <div id="splash-loader" aria-label="در حال بارگذاری"></div>
+    </div>
     <div id="app"></div>
+    <script>
+      // حداقل زمان نمایش splash 600ms — طوری که فلش نزنه در اتصالات سریع
+      var __splashStart = Date.now();
+      window.__hideSplash = function() {
+        var elapsed = Date.now() - __splashStart;
+        var delay = Math.max(0, 600 - elapsed);
+        setTimeout(function() {
+          var s = document.getElementById('splash');
+          if (s) { s.classList.add('hidden'); s.setAttribute('aria-hidden','true'); }
+        }, delay);
+      };
+      // Fallback: اگر بعد از 5ث مخفی نشد، خودب‌خود بردار
+      setTimeout(function(){ window.__hideSplash && window.__hideSplash(); }, 5000);
+    </script>
     <script type="module" src="/src/index.ts"></script>
   </body>
 </html>
