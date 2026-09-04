@@ -228,7 +228,7 @@ export const GAME_BOARD_CSS = `
   gap: 6px;
   padding: var(--dor-space-3);
   padding-block-end: calc(var(--dor-space-3) + env(safe-area-inset-bottom, 0));
-  background: var(--dor-wood-plank);
+  background: url("/assets/img/wood-tray.jpg") center/cover, var(--dor-wood-plank);
   border-radius: var(--dor-radius-3) var(--dor-radius-3) 0 0;
   box-shadow:
     inset 0 3px 0 rgba(255,255,255,0.2),
