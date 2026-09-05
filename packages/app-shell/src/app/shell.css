@@ -1,141 +1,151 @@
 /*
- * @dordaneh/app-shell — استایل پوسته (مالک: AI-05 → واگذار به AI-04 برای RFC-0015)
- * سبک بصری: آمیرزا — پس‌زمینه‌ی صحنه‌ی بازار سنتی + هدر ریبون + ناوبری چوبی.
- * RTL-first با خصوصیات logical، بدون hardcode رنگ (همه از توکن‌های ui-kit).
+ * @dordaneh/app-shell — استایل پوسته (RFC-0015 v3 — visible-scene fix)
+ * مالکیت: AI-04 (Design Director) — فقط ظاهر
+ * سبک بصری: آمیرزا — پس‌زمینه‌ی صحنه‌ی بازار سنتی (تصویر واقعی)
+ *
+ * ⚠️ FIX: نسخه‌ی v2 body::before با z-index -2 پشت stacking context
+ * صحیح نبود. حالا از background مستقیم روی body استفاده می‌کنیم.
  */
 
-html,
-body {
+html {
   margin: 0;
   padding: 0;
-  background: var(--dor-bg);
-  color: var(--dor-ink, inherit);
   font-family: var(--dor-font);
   min-height: 100dvh;
   overscroll-behavior: none;
+  color: var(--dor-ink, inherit);
 }
 
+/* ================================================================
+   پس‌زمینه‌ی صحنه‌ی بازار سنتی ایرانی — مستقیم روی body
+   =============================================================== */
 body {
+  margin: 0;
+  padding: 0;
+  min-height: 100dvh;
+  color: var(--dor-ink, inherit);
+  font-family: var(--dor-font);
   background:
-    var(--dor-scene-sky);
-  background-attachment: fixed;
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.35) 100%),
+    url('/assets/img/scene-bazaar.jpg') center bottom / cover no-repeat fixed,
+    #4a2b18;
 }
 
-/* پس‌زمینه‌ی صحنه‌ی بازار — لایه‌ی SVG ثابت پشت همه صفحات */
+/* لایه‌ی نور برای عمق — روی body با mix-blend */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: url('/assets/scene-bazaar.svg');
-  background-size: cover;
-  background-position: bottom center;
-  background-repeat: no-repeat;
-  z-index: -2;
-  pointer-events: none;
-  opacity: 0.9;
-}
-
-/* حجاب گرم روی صحنه برای خوانایی بهتر متن */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(
-    ellipse at 50% 0%,
-    rgba(244, 232, 208, 0.0) 0%,
-    rgba(244, 232, 208, 0.3) 60%,
-    rgba(244, 232, 208, 0.7) 100%
-  );
-  z-index: -1;
+  background:
+    radial-gradient(
+      ellipse at 50% 15%,
+      rgba(251, 220, 154, 0.15) 0%,
+      rgba(0, 0, 0, 0) 55%
+    ),
+    radial-gradient(
+      ellipse at 50% 100%,
+      rgba(0, 0, 0, 0.4) 0%,
+      rgba(0, 0, 0, 0) 60%
+    );
+  z-index: 0;
   pointer-events: none;
 }
 
+#app,
 #app-shell {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
   max-inline-size: 560px;
   margin-inline: auto;
-  position: relative;
 }
 
-/* هدر ریبون — استایل کامل در ui-kit.css (dor-topbar) هست
-   این‌جا فقط تنظیمات layout در shell */
+/* ================================================================
+   هدر ریبون — تصویر واقعی ریبون قرمز
+   =============================================================== */
 .dor-topbar {
   position: sticky;
   inset-block-start: 0;
   z-index: 10;
-  padding-block: var(--dor-space-3);
+  padding-block: 22px 30px;
   padding-inline: var(--dor-space-5);
   text-align: center;
-  background: var(--dor-ribbon);
-  color: #fff8ec;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+  min-block-size: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dor-space-3);
+  background: transparent;
   overflow: visible;
   isolation: isolate;
 }
-.dor-topbar::before,
-.dor-topbar::after {
+.dor-topbar::before {
   content: '';
   position: absolute;
-  inset-block: 8px;
-  inline-size: 24px;
-  background: var(--dor-ribbon);
-  filter: brightness(0.65);
+  inset-inline: -12px;
+  inset-block: 0;
+  background-image: url('/assets/img/ribbon-banner.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   z-index: -1;
-}
-.dor-topbar::before {
-  inset-inline-start: -12px;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 45% 50%);
-}
-.dor-topbar::after {
-  inset-inline-end: -12px;
-  clip-path: polygon(0 0, 100% 0, 55% 50%, 100% 100%, 0 100%);
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
 }
 
 .dor-logo {
   margin: 0;
   font-family: var(--dor-font-display);
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 900;
   color: #fff8ec;
   text-shadow:
-    0 2px 0 rgba(0, 0, 0, 0.4),
-    0 4px 8px rgba(0, 0, 0, 0.25);
+    0 2px 0 rgba(139, 32, 16, 0.9),
+    0 3px 0 rgba(88, 20, 8, 0.7),
+    0 5px 10px rgba(0, 0, 0, 0.5);
   letter-spacing: 0.02em;
   display: inline-flex;
   align-items: center;
-  gap: var(--dor-space-2);
+  gap: 12px;
 }
 .dor-logo::before {
   content: '';
   display: inline-block;
-  inline-size: 32px;
-  block-size: 32px;
-  background: url('/assets/logo-dordaneh.svg') center / contain no-repeat;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+  inline-size: 46px;
+  block-size: 46px;
+  background: url('/assets/img/logo-pearl.png') center / contain no-repeat;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.5));
 }
 
+/* ================================================================
+   منطقه‌ی محتوا
+   =============================================================== */
 #main-outlet {
   flex: 1;
   padding-inline: var(--dor-space-4);
   padding-block: var(--dor-space-4);
-  padding-block-end: calc(var(--dor-space-6) + 76px);
+  padding-block-end: calc(var(--dor-space-6) + 96px);
   position: relative;
-  z-index: 1;
 }
 
+.dor-screen {
+  position: relative;
+}
 .dor-screen h2 {
   margin: 0 0 var(--dor-space-4);
   font-family: var(--dor-font-display);
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   font-weight: 900;
-  color: var(--dor-ink);
+  color: #fff8ec;
   text-align: center;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.6),
+    0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
-/* ================= ناوبری پایین چوبی ================= */
+/* ================================================================
+   ناوبری پایین — سینی چوبی واقعی
+   =============================================================== */
 .dor-bottom-nav {
   position: fixed;
   inset-block-end: 0;
@@ -143,277 +153,381 @@ body::after {
   display: flex;
   justify-content: space-around;
   align-items: stretch;
-  padding-block: var(--dor-space-2);
-  padding-block-end: calc(var(--dor-space-2) + env(safe-area-inset-bottom, 0px));
-  padding-inline: var(--dor-space-2);
-  background: var(--dor-wood-plank);
-  border-block-start: 3px solid var(--dor-btn-orange-edge);
+  padding-block: 14px;
+  padding-block-end: calc(14px + env(safe-area-inset-bottom, 0px));
+  padding-inline: var(--dor-space-3);
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%),
+    url('/assets/img/wood-tray.jpg') center / cover no-repeat;
   box-shadow:
-    inset 0 3px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.4),
-    0 -6px 16px rgba(0, 0, 0, 0.3);
+    inset 0 3px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.5),
+    0 -10px 24px rgba(0, 0, 0, 0.5);
   max-inline-size: 560px;
   margin-inline: auto;
   z-index: 20;
-}
-.dor-bottom-nav::before {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 6px;
-  block-size: 6px;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0.25) 0 2px,
-    transparent 2px 14px
-  );
-  opacity: 0.5;
-  pointer-events: none;
+  min-block-size: 82px;
 }
 
 .dor-bottom-nav a {
   flex: 1;
   position: relative;
   text-decoration: none;
-  color: rgba(255, 248, 236, 0.75);
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding-block: var(--dor-space-3) var(--dor-space-2);
+  color: #fbdc9a;
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding-block: var(--dor-space-2);
   padding-inline: var(--dor-space-2);
-  border-radius: var(--dor-radius-2);
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  gap: 4px;
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.7),
+    0 2px 4px rgba(0, 0, 0, 0.5);
   transition:
-    color var(--dor-anim-pop) ease,
-    background var(--dor-anim-pop) ease,
-    transform var(--dor-anim-pop) ease;
+    color 120ms ease,
+    background 120ms ease,
+    transform 120ms ease;
   -webkit-tap-highlight-color: transparent;
   min-block-size: var(--dor-touch-min);
 }
 .dor-bottom-nav a:active {
-  transform: scale(0.94);
+  transform: scale(0.92);
 }
 .dor-bottom-nav a.active {
   color: #fff8ec;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.22) 0%,
-    rgba(255, 255, 255, 0.05) 100%
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 215, 100, 0.35) 0%,
+    rgba(255, 215, 100, 0) 70%
   );
-  box-shadow:
-    inset 0 -4px 0 var(--dor-gold),
-    inset 0 2px 0 rgba(255, 255, 255, 0.25);
   text-shadow:
-    0 1px 0 rgba(0, 0, 0, 0.5),
-    0 0 8px rgba(212, 160, 32, 0.5);
+    0 1px 0 rgba(0, 0, 0, 0.6),
+    0 0 14px rgba(255, 215, 100, 0.9);
+}
+.dor-bottom-nav a.active::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 4px;
+  inset-inline: 20%;
+  block-size: 3px;
+  background: linear-gradient(90deg, transparent, #fbdc65, transparent);
+  border-radius: 3px;
+  box-shadow: 0 0 12px #fbdc65;
 }
 
-/* ================= بج زایگارنیک آلبوم (نشان جدید بودن) ================= */
+/* ================================================================
+   بج زایگارنیک
+   =============================================================== */
 .dor-badge {
   position: absolute;
   inset-block-start: 4px;
-  inset-inline-end: 8px;
-  min-inline-size: 18px;
-  block-size: 18px;
-  padding-inline: 5px;
-  border-radius: var(--dor-radius-round);
-  background: var(--dor-btn-red);
+  inset-inline-end: 12px;
+  min-inline-size: 20px;
+  block-size: 20px;
+  padding-inline: 6px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #e5654c 0%, #b83e2a 100%);
   color: #fff8ec;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 900;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* ================= صفحه‌ی onboarding ================= */
+/* ================================================================
+   Onboarding — با مسکات دُردانه واقعی
+   =============================================================== */
 .dor-onboarding {
   display: flex;
   flex-direction: column;
   gap: var(--dor-space-5);
-  padding-block: var(--dor-space-5);
+  padding-block: var(--dor-space-4) var(--dor-space-6);
   text-align: center;
+  position: relative;
+  align-items: center;
+  min-block-size: 70vh;
 }
+
+.dor-onboarding::before {
+  content: '';
+  display: block;
+  width: 240px;
+  height: 240px;
+  background: url('/assets/img/mascot-dordaneh.png') center / contain no-repeat;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.6));
+  animation: mascot-bob 3.2s ease-in-out infinite;
+  margin-block-end: var(--dor-space-2);
+}
+@keyframes mascot-bob {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50%      { transform: translateY(-10px) rotate(2deg); }
+}
+
 .dor-onboarding h1 {
   font-family: var(--dor-font-display);
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 900;
   margin: 0;
-  color: var(--dor-ink);
-  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.6);
-}
-.dor-onboarding p {
-  font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--dor-ink-soft);
-  margin: 0;
-}
-.dor-primary,
-.dor-onboarding .dor-primary {
-  align-self: center;
-  min-inline-size: 200px;
+  color: #fff8ec;
+  text-shadow:
+    0 2px 0 rgba(139, 32, 16, 0.9),
+    0 3px 0 rgba(88, 20, 8, 0.7),
+    0 6px 16px rgba(0, 0, 0, 0.6);
+  padding-inline: var(--dor-space-3);
+  line-height: 1.3;
 }
 
-/* یادداشت اسکلت (فقط dev) */
+.dor-onboarding p {
+  font-size: 1.15rem;
+  line-height: 1.75;
+  color: #fff8ec;
+  margin: 0 auto;
+  max-inline-size: 92%;
+  padding: var(--dor-space-4);
+  background: rgba(58, 36, 22, 0.78);
+  border-radius: 20px;
+  border: 2px solid rgba(255, 215, 100, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* دکمه‌ی primary — گنبدی نارنجی درشت (سبک آمیرزا) */
+.dor-primary {
+  align-self: center;
+  min-inline-size: 240px;
+  min-block-size: 64px;
+  padding: 18px 46px;
+  font-family: var(--dor-font-display);
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #fff8ec;
+  background: linear-gradient(180deg, #fbb040 0%, #ec7823 45%, #b04d0f 100%);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow:
+    0 6px 0 #7a3608,
+    0 10px 28px rgba(0, 0, 0, 0.5),
+    inset 0 3px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 0 rgba(139, 60, 8, 0.85);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+.dor-primary::before {
+  content: '';
+  position: absolute;
+  inset: 4px 10px auto 10px;
+  height: 42%;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+.dor-primary:active {
+  transform: translateY(4px);
+  box-shadow:
+    0 2px 0 #7a3608,
+    0 4px 10px rgba(0, 0, 0, 0.4),
+    inset 0 3px 0 rgba(255, 255, 255, 0.45);
+}
+.dor-primary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 6px 0 #7a3608,
+    0 10px 28px rgba(0, 0, 0, 0.5),
+    0 0 0 4px rgba(255, 215, 100, 0.7),
+    inset 0 3px 0 rgba(255, 255, 255, 0.55);
+}
+
 .dor-mock-note {
   padding: var(--dor-space-3);
-  background: rgba(230, 165, 39, 0.15);
-  border: 1px dashed var(--dor-present);
-  border-radius: var(--dor-radius-2);
-  font-size: 0.85rem;
-  color: var(--dor-ink-soft);
+  background: rgba(58, 36, 22, 0.85);
+  border: 2px dashed rgba(255, 215, 100, 0.6);
+  border-radius: 14px;
+  font-size: 0.9rem;
+  color: #fbdc9a;
   text-align: center;
+  backdrop-filter: blur(6px);
 }
 
-/* ================= tile در تخته shell (fallback ساده) ================= */
+/* ================================================================
+   تخته و کاشی — fallback (اصلی در game-board)
+   =============================================================== */
 .dor-tile {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  inline-size: 52px;
-  block-size: 52px;
-  border-radius: 10px;
+  inline-size: 56px;
+  block-size: 56px;
+  border-radius: 12px;
   font-family: var(--dor-font-display);
-  font-size: 1.6rem;
+  font-size: 1.9rem;
   font-weight: 900;
-  background: var(--dor-tile-empty-face);
-  color: var(--dor-on-tile-empty);
-  border: 2px solid var(--dor-tile-empty-border);
+  background: linear-gradient(180deg, #fbf3dc 0%, #efdcb2 100%);
+  color: #6d4c2f;
+  border: 3px solid rgba(139, 90, 43, 0.6);
   box-shadow:
-    inset 0 -3px 0 rgba(0, 0, 0, 0.1),
-    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+    inset 0 -4px 0 rgba(0, 0, 0, 0.15),
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    0 3px 6px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 .dor-tile[data-state='correct'] {
-  background: var(--dor-tile-correct-face);
-  color: var(--dor-on-correct);
+  background: linear-gradient(180deg, #7cc846 0%, #4d8f2c 55%, #2b5f12 100%);
+  color: #fff8ec;
   border-color: transparent;
   box-shadow:
-    inset 0 -4px 0 var(--dor-tile-correct-edge),
-    inset 0 2px 0 rgba(255, 255, 255, 0.35);
-  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+    inset 0 -5px 0 #1f4a0d,
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    0 4px 10px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
 }
 .dor-tile[data-state='present'] {
-  background: var(--dor-tile-present-face);
-  color: var(--dor-on-present);
+  background: linear-gradient(180deg, #fbdc65 0%, #e6a527 55%, #a56f11 100%);
+  color: #3a2416;
   border-color: transparent;
   box-shadow:
-    inset 0 -4px 0 var(--dor-tile-present-edge),
-    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+    inset 0 -5px 0 #7a4f08,
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    0 4px 10px rgba(0, 0, 0, 0.35);
 }
 .dor-tile[data-state='absent'] {
-  background: var(--dor-tile-absent-face);
-  color: var(--dor-on-absent);
+  background: linear-gradient(160deg, #7a4c26 0%, #5c3418 55%, #3a1f0c 100%);
+  color: #fbdc65;
   border-color: transparent;
   box-shadow:
-    inset 0 -4px 0 var(--dor-tile-absent-edge),
-    inset 0 2px 0 rgba(255, 255, 255, 0.25);
-  text-shadow:
-    0 2px 0 rgba(0, 0, 0, 0.5),
-    0 3px 6px rgba(0, 0, 0, 0.3);
+    inset 0 -5px 0 #2a1a0a,
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    0 4px 10px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
 }
 
 .dor-board {
   display: grid;
-  gap: var(--dor-space-2);
+  gap: 10px;
   justify-content: center;
   margin-block: var(--dor-space-4);
+  padding: var(--dor-space-3);
+  background: rgba(58, 36, 22, 0.55);
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  border: 2px solid rgba(255, 215, 100, 0.3);
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.35);
 }
 .dor-row {
   display: flex;
-  gap: var(--dor-space-2);
+  gap: 10px;
   justify-content: center;
 }
 
-/* ================= فرم حدس (fallback shell) ================= */
+/* ================================================================
+   فرم حدس (fallback)
+   =============================================================== */
 .dor-guess-form {
   display: flex;
   gap: var(--dor-space-2);
   margin-block: var(--dor-space-4);
   padding: var(--dor-space-3);
-  background: var(--dor-surface);
-  border-radius: var(--dor-radius-3);
-  box-shadow: var(--dor-shadow-2);
-  border: 2px solid var(--dor-border);
+  background: rgba(251, 243, 220, 0.96);
+  border-radius: 20px;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 3px rgba(212, 160, 32, 0.5);
+  backdrop-filter: blur(6px);
 }
 .dor-guess-form input {
   flex: 1;
   padding: var(--dor-space-3);
-  border: 2px solid var(--dor-border);
-  border-radius: var(--dor-radius-2);
+  border: 2px solid #b89670;
+  border-radius: 14px;
   font-family: var(--dor-font);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: var(--dor-ink);
-  background: var(--dor-bg);
+  color: #3a2416;
+  background: #fbf3dc;
   text-align: center;
   min-block-size: var(--dor-touch-min);
 }
 .dor-guess-form input:focus {
   outline: none;
-  border-color: var(--dor-btn-orange);
-  box-shadow: var(--dor-focus-ring);
+  border-color: #ec7823;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.4);
 }
 .dor-guess-form button {
   min-inline-size: var(--dor-touch-min);
   padding-inline: var(--dor-space-4);
   font-family: var(--dor-font);
-  font-weight: 800;
-  font-size: 1rem;
+  font-weight: 900;
+  font-size: 1.05rem;
   color: #fff8ec;
-  background: var(--dor-btn-green);
+  background: linear-gradient(180deg, #7cc846 0%, #4d8f2c 50%, #2b5f12 100%);
   border: none;
-  border-radius: var(--dor-radius-2);
+  border-radius: 999px;
   cursor: pointer;
   box-shadow:
-    0 4px 0 var(--dor-btn-green-edge),
-    0 6px 10px rgba(0, 0, 0, 0.25),
-    inset 0 2px 0 rgba(255, 255, 255, 0.35);
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
-  transition: transform var(--dor-anim-pop) ease, box-shadow var(--dor-anim-pop) ease;
+    0 5px 0 #1f4a0d,
+    0 7px 12px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 80ms ease, box-shadow 80ms ease;
 }
 .dor-guess-form button:active {
-  transform: translateY(3px);
+  transform: translateY(4px);
   box-shadow:
-    0 1px 0 var(--dor-btn-green-edge),
-    0 2px 4px rgba(0, 0, 0, 0.25),
-    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    0 1px 0 #1f4a0d,
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 0 rgba(255, 255, 255, 0.35);
 }
 
-/* ================= کارت فرهنگی (peak-end) ================= */
+/* ================================================================
+   کارت فرهنگی — قاب تذهیب واقعی
+   =============================================================== */
 .dor-peak-end,
 .dor-card {
   position: relative;
   margin-block: var(--dor-space-4);
-  padding: var(--dor-space-5) var(--dor-space-4);
-  background: var(--dor-card-paper);
-  color: var(--dor-ink);
-  border-radius: var(--dor-radius-3);
-  box-shadow:
-    var(--dor-shadow-3),
-    inset 0 0 0 3px var(--dor-card-border),
-    inset 0 0 0 5px var(--dor-surface),
-    inset 0 0 0 6px var(--dor-card-border);
-  overflow: hidden;
+  padding: 44px 36px;
+  min-block-size: 280px;
+  color: #3a2416;
+  border-radius: 0;
+  overflow: visible;
+  background-image: url('/assets/img/tazhib-frame.jpg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.55));
+  text-align: center;
+  font-size: 1.15rem;
+  line-height: 1.9;
+  font-weight: 500;
 }
 .dor-card small {
   display: block;
   margin-block-start: var(--dor-space-3);
   padding-block-start: var(--dor-space-3);
-  border-block-start: 1px dashed var(--dor-card-border);
-  font-size: 0.85rem;
-  color: var(--dor-ink-soft);
+  border-block-start: 1px dashed rgba(165, 111, 17, 0.5);
+  font-size: 0.9rem;
+  color: #6d4c2f;
   text-align: center;
   font-style: italic;
 }
 
-/* ================= لیست آلبوم ================= */
+/* ================================================================
+   لیست آلبوم
+   =============================================================== */
 .dor-album-list {
   list-style: none;
   padding: 0;
@@ -423,7 +537,9 @@ body::after {
   gap: var(--dor-space-3);
 }
 
-/* ================= تنظیمات ================= */
+/* ================================================================
+   تنظیمات
+   =============================================================== */
 .dor-settings-row {
   display: flex;
   align-items: center;
@@ -431,32 +547,34 @@ body::after {
   gap: var(--dor-space-3);
   padding: var(--dor-space-4);
   margin-block-end: var(--dor-space-3);
-  background: var(--dor-surface);
-  border-radius: var(--dor-radius-2);
-  box-shadow: var(--dor-shadow-1);
-  border-inline-start: 4px solid var(--dor-accent);
+  background: rgba(251, 243, 220, 0.96);
+  border-radius: 18px;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.3),
+    inset 0 -3px 0 rgba(184, 150, 112, 0.4);
+  border-inline-start: 5px solid #ec7823;
+  backdrop-filter: blur(6px);
 }
 .dor-settings-label {
-  font-weight: 700;
-  color: var(--dor-ink);
+  font-weight: 800;
+  color: #3a2416;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 .dor-settings-label small {
-  font-size: 0.8rem;
-  font-weight: 400;
-  color: var(--dor-ink-soft);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6d4c2f;
 }
 
-/* segmented control */
 .dor-segmented {
   display: inline-flex;
   padding: 4px;
-  background: var(--dor-surface-2);
-  border-radius: var(--dor-radius-round);
+  background: rgba(58, 36, 22, 0.15);
+  border-radius: 999px;
   gap: 2px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 .dor-segmented button {
   min-inline-size: 60px;
@@ -464,57 +582,66 @@ body::after {
   padding-inline: var(--dor-space-3);
   border: none;
   background: transparent;
-  border-radius: var(--dor-radius-round);
+  border-radius: 999px;
   font-family: var(--dor-font);
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--dor-ink-soft);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #6d4c2f;
   cursor: pointer;
-  transition: all var(--dor-anim-pop) ease;
+  transition: all 120ms ease;
 }
 .dor-segmented button[aria-checked='true'] {
-  background: var(--dor-btn-orange);
+  background: linear-gradient(180deg, #fbb040 0%, #ec7823 50%, #b04d0f 100%);
   color: #fff8ec;
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+    0 3px 0 #7a3608,
+    0 4px 6px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
 }
 
-/* ================= صفحه درباره / حریم خصوصی ================= */
+/* ================================================================
+   درباره / حریم خصوصی
+   =============================================================== */
 .dor-about,
 .dor-privacy {
   padding: var(--dor-space-4);
-  background: var(--dor-surface);
-  border-radius: var(--dor-radius-3);
-  box-shadow: var(--dor-shadow-2);
-  color: var(--dor-ink);
-  line-height: 1.8;
+  background: rgba(251, 243, 220, 0.96);
+  border-radius: 20px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+  color: #3a2416;
+  line-height: 1.85;
+  backdrop-filter: blur(6px);
 }
 
-/* ================= پیوند ادامه (resume) ================= */
+/* ================================================================
+   ادامه (resume)
+   =============================================================== */
 .dor-resume {
   padding: var(--dor-space-4);
-  background: linear-gradient(180deg, var(--dor-surface) 0%, var(--dor-surface-2) 100%);
-  border-radius: var(--dor-radius-3);
-  border: 2px solid var(--dor-gold);
-  box-shadow: var(--dor-shadow-2), 0 0 20px rgba(212, 160, 32, 0.25);
+  background: linear-gradient(180deg, #fbf3dc 0%, #f0e0b8 100%);
+  border-radius: 20px;
+  border: 3px solid #d4a020;
+  box-shadow:
+    0 8px 26px rgba(0, 0, 0, 0.35),
+    0 0 32px rgba(212, 160, 32, 0.4),
+    inset 0 0 0 5px #fbf3dc,
+    inset 0 0 0 6px #d4a020;
   text-align: center;
   margin-block: var(--dor-space-4);
+  position: relative;
 }
 .dor-resume a {
-  color: var(--dor-danger);
-  font-weight: 800;
+  color: #b83e2a;
+  font-weight: 900;
   text-decoration: none;
   padding-inline: var(--dor-space-2);
+  font-size: 1.1rem;
 }
 .dor-resume a:hover {
   text-decoration: underline;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body::before,
-  body::after {
-    animation: none;
-  }
+  .dor-onboarding::before { animation: none; }
 }
