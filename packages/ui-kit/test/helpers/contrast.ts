@@ -42,13 +42,24 @@ export const AA_LARGE = 3;
 export function parseCssVars(css: string, selector: string): Record<string, string> {
   const out: Record<string, string> = {};
   const clean = css.replace(/\/\*[\s\S]*?\*\//g, ''); // حذف کامنت‌ها
-  const esc = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const re = new RegExp(`${esc}\\s*\\{([^}]*)\\}`, 'g');
+
+  /*
+   * ⚠️ سلکتورها می‌توانند گروهی باشند (مثل «:root, [data-dor-theme='light'] {»).
+   * پارسر قبلی فقط سلکتور تنها را می‌گرفت، پس بعد از بازطراحی گرافیکی همه‌ی
+   * توکن‌ها «missing» می‌شدند و ۳۳ تست بی‌دلیل می‌شکست. این‌جا هر بلوک را جدا
+   * می‌کنیم و سلکتورش را با کاما می‌شکنیم.
+   */
+  const blockRe = /([^{}]+)\{([^}]*)\}/g;
   let m: RegExpExecArray | null;
-  while ((m = re.exec(clean)) !== null) {
-    const body = m[1] ?? '';
+  while ((m = blockRe.exec(clean)) !== null) {
+    const rawSelector = (m[1] ?? '').trim();
+    // بلوک‌های تودرتو مثل @media خودشان سلکتور نیستند
+    if (rawSelector.startsWith('@')) continue;
+    const parts = rawSelector.split(',').map((s) => s.trim().replace(/\s+/g, ' '));
+    if (!parts.includes(selector.trim().replace(/\s+/g, ' '))) continue;
+    const body = m[2] ?? '';
     for (const line of body.split(';')) {
-      const kv = /^\s*(--[\w-]+)\s*:\s*(.+)\s*$/.exec(line);
+      const kv = /^\s*(--[\w-]+)\s*:\s*(.+?)\s*$/.exec(line);
       if (kv && kv[1] && kv[2]) out[kv[1]] = kv[2].trim();
     }
   }

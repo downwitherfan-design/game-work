@@ -5,6 +5,11 @@
 import { render } from 'preact';
 import { useState } from 'preact/hooks';
 import type { JSX } from 'preact';
+// ⚠️ دیزاین‌سیستم واقعی (AI-04). این دو import اجباری است: بدون آن‌ها
+// هیچ‌کدام از متغیرهای --dor-* تعریف نمی‌شوند و کاشی‌های بازی
+// بی‌رنگ و نامرئی دیده می‌شوند (باگی که در نسخه‌ی نصب‌شده دیده شد).
+import '@dordaneh/ui-kit/src/tokens.css';
+import '@dordaneh/ui-kit/src/ui-kit.css';
 import { getBus } from '../core/bus';
 import { createShellStorage } from '../core/storage';
 import {
@@ -16,7 +21,6 @@ import {
 import { setLocale } from '../core/i18n';
 import { createServices } from '../services/registry';
 import { createOrchestrator } from '../services/orchestrator';
-import { injectMockTokens } from '../mocks/tokens.mock';
 import { AppContext, type ShellContext } from './context';
 import { App } from './App';
 
@@ -45,6 +49,25 @@ export interface BootOptions {
   registerSw?: boolean;
 }
 
+/**
+ * CSS برد بازی را از پکیج مالک (AI-06) می‌گیرد و یک‌بار در head تزریق می‌کند.
+ * اگر پکیج در دسترس نبود، بوت نباید بشکند.
+ */
+async function injectGameBoardCss(doc: Document): Promise<void> {
+  if (doc.getElementById('dor-game-board-css')) return;
+  try {
+    const mod = (await import('@dordaneh/game-board')) as Record<string, unknown>;
+    const css = mod['GAME_BOARD_CSS'];
+    if (typeof css !== 'string' || css.length === 0) return;
+    const style = doc.createElement('style');
+    style.id = 'dor-game-board-css';
+    style.textContent = css;
+    doc.head.appendChild(style);
+  } catch {
+    // پکیج برد بازی در دسترس نیست — بقیه‌ی اپ باید کار کند
+  }
+}
+
 export async function bootstrap(opts: BootOptions): Promise<void> {
   const { doc } = opts;
 
@@ -69,7 +92,10 @@ export async function bootstrap(opts: BootOptions): Promise<void> {
 
   const orchestrator = createOrchestrator(bus, services, storage);
 
-  injectMockTokens(doc); // فقط تا آماده‌شدن ui-kit واقعی اثر دارد
+  // ⚠️ CSS برد بازی (AI-06) فقط به‌صورت رشته صادر می‌شود و مصرف‌کننده
+  // باید خودش تزریقش کند. قبلاً فقط در demo تزریق می‌شد، پس در اپ
+  // واقعی کاشی‌ها و کیبورد بدون استایل رندر می‌شدند.
+  await injectGameBoardCss(doc);
 
   const mount = doc.getElementById('app');
   if (!mount) {

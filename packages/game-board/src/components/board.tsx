@@ -67,7 +67,7 @@ export function Board({ s }: BoardProps) {
       class="gb-board"
       role="grid"
       aria-label={tFa('gameBoard.boardLabel')}
-      style={`--gb-len:${s.wordLength}`}
+      style={`--gb-len:${s.wordLength};--gb-rows:${s.maxGuesses}`}
     >
       {rows.map((r) => (
         <div

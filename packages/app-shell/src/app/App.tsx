@@ -9,6 +9,8 @@ import { t } from '../core/i18n';
 import { useShell } from './context';
 import { Onboarding } from './Onboarding';
 import { SettingsScreen } from './Settings';
+import { Home } from './Home';
+import { LevelsScreen } from './Levels';
 import {
   loadAlbumScreen,
   loadDuelScreen,
@@ -25,6 +27,29 @@ const StatsScreen = lazy(loadStatsScreen);
 const AlbumScreen = lazy(loadAlbumScreen);
 const DuelScreen = lazy(loadDuelScreen);
 const ShopScreen = lazy(loadShopScreen);
+
+/**
+ * تزریق سرویس‌های واقعی به GameScreen.
+ *
+ * ⚠️ باگ بحرانی که اینجا رفع شد: قبلاً `<Route component={DailyScreen} />`
+ * هیچ prop نمی‌گرفت، پس GameScreen داخل خودش `resolveEngine()` را **بدون
+ * wordDb** صدا می‌زد و طبق آداپتور به `createMockEngine()` می‌افتاد. نتیجه:
+ * کاربر «موتور mock با کلمات جعلی» می‌دید، در حالی که موتور و واژه‌نامه‌ی
+ * واقعی سالم بودند و فقط تزریق نمی‌شدند.
+ */
+function GameRoute(props: { mode: 'daily' | 'practice' | 'duel'; duelSeed?: number }): JSX.Element {
+  const { services, bus } = useShell();
+  const Screen = props.mode === 'practice' ? PracticeScreen : DailyScreen;
+  return (
+    <Screen
+      mode={props.mode}
+      duelSeed={props.duelSeed}
+      engine={services.engine}
+      audio={services.audio}
+      bus={bus}
+    />
+  );
+}
 
 function NavLink(props: {
   href: string;
@@ -67,12 +92,18 @@ function BottomNav(): JSX.Element {
 
   return (
     <nav id="bottom-nav" class="dor-bottom-nav" dir="rtl">
-      <NavLink href="/" id="nav-daily" label={t('appShell.nav.daily')} active={path === '/'} />
+      <NavLink href="/" id="nav-home" label={t('appShell.nav.home')} active={path === '/'} />
       <NavLink
-        href="/practice"
-        id="nav-practice"
-        label={t('appShell.nav.practice')}
-        active={path.startsWith('/practice')}
+        href="/daily"
+        id="nav-daily"
+        label={t('appShell.nav.daily')}
+        active={path.startsWith('/daily')}
+      />
+      <NavLink
+        href="/levels"
+        id="nav-levels"
+        label={t('appShell.nav.levels')}
+        active={path.startsWith('/levels')}
       />
       <NavLink
         href="/stats"
@@ -164,8 +195,12 @@ export function App(): JSX.Element {
         <ResumeBanner />
         <ErrorBoundary>
           <Router>
-            <Route path="/" component={DailyScreen} />
-            <Route path="/practice" component={() => <PracticeScreen mode="practice" />} />
+            {/* «/» منوی اصلی است — کاربر باید یک اپ ببیند، نه اینکه
+                بی‌مقدمه داخل تخته‌ی بازی پرتاب شود. */}
+            <Route path="/" component={Home} />
+            <Route path="/daily" component={() => <GameRoute mode="daily" />} />
+            <Route path="/levels" component={LevelsScreen} />
+            <Route path="/practice" component={() => <GameRoute mode="practice" />} />
             <Route path="/stats" component={StatsScreen} />
             <Route path="/album" component={AlbumScreen} />
             <Route path="/duel/*" component={DuelScreen} />

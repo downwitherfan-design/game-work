@@ -4,7 +4,7 @@
  * نوار پیشرفت + آمار زنده + حالت تمرکز + کیبورد فیزیکی.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'preact/hooks';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import type { AudioApi, EngineApi, EventBus } from '@dordaneh/contracts';
 import { createEventBus, puzzleNumberForNow, toPersianDigits } from '@dordaneh/contracts';
 import { createBoardController, type BoardController, type GameMode } from '../logic/controller';
@@ -36,14 +36,42 @@ export interface GameScreenProps {
   liveStat?: LiveStatData | null;
   /** سهمیه‌ی راهنمای رایگان (پیش‌فرض ۱) */
   freeHintQuota?: number;
+
+  // --- افزوده‌های یکپارچه‌سازی پوسته (همه اختیاری، رفتار پیشین دست‌نخورده) ---
+  /**
+   * seed قطعی برای mode='practice'. برای «مراحل» لازم است تا مرحله‌ی N
+   * همیشه همان کلمه را بدهد (پیش‌فرض: seed تصادفی مثل قبل).
+   */
+  practiceSeed?: number;
+  /** دشواری ثابت ۱..۵ برای mode='practice' (پیش‌فرض: انتخاب کاربر، ۲) */
+  practiceDifficulty?: number;
+  /** پنهان‌کردن انتخابگر دشواری (در «مراحل» دشواری از مرحله می‌آید) */
+  hideDifficultyPicker?: boolean;
+  /** پنهان‌کردن دکمه‌ی «معمای تازه» (در «مراحل» جریان از صفحه‌ی مراحل است) */
+  hideNewPractice?: boolean;
+  /**
+   * پایان معما (برد یا باخت). آنبوردینگ و صفحه‌ی مراحل به آن تکیه دارند.
+   * ⚠️ قبلاً وجود نداشت و آنبوردینگ برای همیشه گیر می‌کرد.
+   */
+  onFinished?: (won: boolean) => void;
 }
 
 const FOCUS_AFTER_GUESSES = 3; // حالت تمرکز (Sweller 1988)
 
 export function GameScreen(props: GameScreenProps) {
   const { mode } = props;
-  const [difficulty, setDifficulty] = useState(2);
-  const [practiceSeed, setPracticeSeed] = useState(() => Math.floor(Math.random() * 1e9));
+  const [difficulty, setDifficulty] = useState(props.practiceDifficulty ?? 2);
+  const [practiceSeed, setPracticeSeed] = useState(
+    () => props.practiceSeed ?? Math.floor(Math.random() * 1e9),
+  );
+
+  // اگر والد (مثلاً صفحه‌ی مراحل) مرحله را عوض کند، معما باید عوض شود
+  useEffect(() => {
+    if (props.practiceSeed !== undefined) setPracticeSeed(props.practiceSeed);
+  }, [props.practiceSeed]);
+  useEffect(() => {
+    if (props.practiceDifficulty !== undefined) setDifficulty(props.practiceDifficulty);
+  }, [props.practiceDifficulty]);
   const [, force] = useState(0);
   const rerender = useCallback(() => force((n: number) => n + 1), []);
 
@@ -102,6 +130,18 @@ export function GameScreen(props: GameScreenProps) {
   }, [controller]);
 
   const s = controller.getState();
+
+  // اعلام پایان معما به والد — یک‌بار برای هر معما (آنبوردینگ/مراحل)
+  const onFinished = props.onFinished;
+  const finishedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!onFinished) return;
+    if (s.phase !== 'won' && s.phase !== 'lost') return;
+    if (finishedRef.current === puzzle.puzzleId) return;
+    finishedRef.current = puzzle.puzzleId;
+    onFinished(s.phase === 'won');
+  }, [s.phase, puzzle.puzzleId, onFinished]);
+
   const progress = computeProgress(s.guesses, s.wordLength);
   const focusMode = s.phase === 'typing' && s.guesses.length >= FOCUS_AFTER_GUESSES;
   const playing = s.phase === 'typing' || s.phase === 'revealing';
@@ -139,7 +179,10 @@ export function GameScreen(props: GameScreenProps) {
       ) : null}
 
       {/* انتخاب دشواری — فقط practice و قبل از اولین حدس */}
-      {mode === 'practice' && s.guesses.length === 0 && s.phase === 'typing' ? (
+      {mode === 'practice' &&
+      !props.hideDifficultyPicker &&
+      s.guesses.length === 0 &&
+      s.phase === 'typing' ? (
         <div class="gb-difficulty gb-peripheral" aria-label={tFa('gameBoard.practiceDifficulty')}>
           {[1, 2, 3, 4, 5].map((d) => (
             <button
@@ -178,7 +221,10 @@ export function GameScreen(props: GameScreenProps) {
       />
 
       {/* practice: معمای جدید پس از پایان */}
-      {mode === 'practice' && (s.phase === 'won' || s.phase === 'lost') && !s.resultOpen ? (
+      {mode === 'practice' &&
+      !props.hideNewPractice &&
+      (s.phase === 'won' || s.phase === 'lost') &&
+      !s.resultOpen ? (
         <button
           type="button"
           class="gb-share-btn"

@@ -10,20 +10,43 @@
 import { TIMINGS } from './logic/timings';
 
 export const GAME_BOARD_CSS = `
+/*
+ * ⚠️ بدون box-sizing، padding تخته/کیبورد به عرض ۱۰۰٪ اضافه می‌شد و از
+ * لبه‌ی صفحه بیرون می‌زد (تخته ۴۱۰px داخل صفحه‌ی ۳۹۶px — همان سرریزی که
+ * در اسکرین‌شات دیده شد).
+ */
+.gb-screen,
+.gb-screen *,
+.gb-screen *::before,
+.gb-screen *::after {
+  box-sizing: border-box;
+}
+
 /* ============ صفحه ============ */
 .gb-screen {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--dor-space-4);
-  padding: var(--dor-space-3);
+  justify-content: space-between;
+  gap: var(--dor-space-2);
+  padding: var(--dor-space-2);
   font-family: var(--dor-font);
   direction: rtl;
   max-inline-size: 520px;
   margin-inline: auto;
-  min-block-size: 100%;
   touch-action: manipulation;
+  /*
+   * ⚠️ کل صفحه‌ی بازی باید در یک نمای گوشی جا شود، وگرنه ردیف سوم کیبورد
+   * (ثبت / پاک‌کن) زیر ناوبری پایین پنهان می‌شود و کاربر فکر می‌کند اپ خراب
+   * است — همان چیزی که در نسخه‌ی نصب‌شده دیده شد.
+   * --dor-shell-chrome را پوسته ست می‌کند (ارتفاع هدر + ناوبری).
+   */
+  min-block-size: calc(100dvh - var(--dor-shell-chrome, 190px));
+  max-block-size: calc(100dvh - var(--dor-shell-chrome, 190px));
 }
+
+/* کیبورد هرگز فشرده نمی‌شود؛ برد در فضای باقی‌مانده جمع می‌شود */
+.gb-screen > .gb-keyboard { flex: 0 0 auto; }
 
 /* حالت تمرکز */
 .gb-screen[data-focus='true'] .gb-peripheral {
@@ -35,21 +58,73 @@ export const GAME_BOARD_CSS = `
 /* ============ برد ============ */
 .gb-board {
   display: grid;
-  gap: 8px;
-  inline-size: 100%;
-  max-inline-size: min(94vw, 400px);
+  /*
+   * ⚠️ «اندازه‌ی خانه» تنها منبع حقیقتِ چیدمان برد است. هم عرض و هم ارتفاع
+   * از آن می‌آیند، پس:
+   *   ۱) کاشی‌ها همیشه مربع‌اند (بدون aspect-ratio و بدون کشیدگی)
+   *   ۲) ردیف آخر هرگز بریده نمی‌شود، چون ارتفاع برد ≤ فضای باقی‌مانده است
+   *   ۳) تخته دور کلمه‌ی ۵ حرفی باریک می‌شود، نه اینکه خانه‌ها پهن شوند
+   * --dor-shell-chrome را پوسته ست می‌کند (هدر + ناوبری + نوار مرحله)،
+   * --gb-outside تقریبِ ارتفاعِ چیزهای غیرِبرد است (سربرگ + پیشرفت + کیبورد).
+   */
+  --gb-outside: 390px;
+  --gb-cell: clamp(
+    26px,
+    min(
+      12.5vw,
+      calc(
+        (100dvh - var(--dor-shell-chrome, 190px) - var(--gb-outside)) /
+          var(--gb-rows, 6)
+      )
+    ),
+    58px
+  );
+  grid-template-rows: repeat(var(--gb-rows, 6), var(--gb-cell));
+  gap: 6px;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  margin-inline: auto;
+  flex: 0 0 auto;
+  min-block-size: 0;
   padding: var(--dor-space-3);
-  background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.15) 100%);
+  /* تخته‌ی چوبی تیره — بدون آن کاشی‌های کِرِمی روی پس‌زمینه‌ی گرمِ صحنه
+     «نامرئی» می‌شدند (باگی که کاربر در نسخه‌ی نصب‌شده دید). */
+  background: var(--dor-wood-plank, linear-gradient(180deg, #8b5a2b 0%, #5a3418 100%));
+  border: 3px solid rgba(58, 31, 12, 0.55);
   border-radius: var(--dor-radius-3);
   box-shadow:
-    inset 0 3px 8px rgba(0,0,0,0.15),
-    0 4px 12px rgba(0,0,0,0.1);
+    inset 0 3px 10px rgba(0,0,0,0.45),
+    inset 0 -3px 0 rgba(255,255,255,0.08),
+    0 8px 20px rgba(0,0,0,0.35);
 }
 .gb-row {
   display: grid;
-  grid-template-columns: repeat(var(--gb-len, 6), 1fr);
-  gap: 8px;
+  /* ستون‌ها هم‌اندازه‌ی خانه‌اند → کاشیِ مربع تضمین‌شده */
+  grid-template-columns: repeat(var(--gb-len, 6), var(--gb-cell, 52px));
+  gap: 6px;
   direction: rtl;
+  min-block-size: 0;
+  justify-content: center;
+}
+
+/*
+ * ⚠️ کاشی ui-kit (.dor-tile) اندازه‌ی ثابت 56px و min-inline-size: 48px دارد.
+ * داخل گرید 1fr این باعث می‌شد min-content ردیف از عرض تخته بزرگ‌تر شود و
+ * ردیف از لبه‌ی تخته بیرون بزند (باگی که در اسکرین‌شات دیده شد).
+ * این‌جا کاشی را وادار می‌کنیم خانه‌ی گرید را پر کند و مربع بماند.
+ */
+.gb-row > .dor-tile,
+.gb-row > .gb-tile {
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+  aspect-ratio: auto;
+}
+/* اندازه‌ی حرف با خانه هم‌مقیاس می‌شود (نه با vw، تا در مرحله هم درست بماند) */
+.gb-row > .dor-tile .dor-tile__face,
+.gb-row > .gb-tile {
+  font-size: calc(var(--gb-cell, 52px) * 0.56);
 }
 
 /* لرزش حدس نامعتبر */
@@ -76,6 +151,11 @@ export const GAME_BOARD_CSS = `
   border: 2px solid var(--dor-tile-empty-border);
   background: var(--dor-tile-empty-face);
   color: var(--dor-on-tile-empty);
+  /* برجستگی کاشی خالی روی تخته‌ی چوبی — خوانایی قطعی */
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,0.65),
+    inset 0 -3px 0 rgba(0,0,0,0.12),
+    0 3px 6px rgba(0,0,0,0.3);
   user-select: none;
   transform-style: preserve-3d;
   will-change: transform;

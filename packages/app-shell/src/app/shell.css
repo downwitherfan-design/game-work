@@ -120,7 +120,12 @@ body::after {
   flex: 1;
   padding-inline: var(--dor-space-4);
   padding-block: var(--dor-space-4);
-  padding-block-end: calc(var(--dor-space-6) + 76px);
+  /*
+   * ⚠️ ناوبری پایین ثابت (~۸۷px) است و روی محتوا می‌نشیند. فاصله‌ی انتهایی
+   * باید از ارتفاع واقعی ناوبری + safe-area بیشتر باشد، وگرنه آخرین کاشیِ
+   * منو نیمه‌پنهان می‌شود (باگی که در نمای خانه دیده شد).
+   */
+  padding-block-end: calc(var(--dor-space-6) + 96px + env(safe-area-inset-bottom, 0px));
   position: relative;
   z-index: 1;
 }
@@ -517,4 +522,450 @@ body::after {
   body::after {
     animation: none;
   }
+}
+
+/* ================================================================
+   صفحه‌ی خانه (منوی اصلی)
+   ================================================================ */
+.dor-home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dor-space-5);
+  max-inline-size: 560px;
+  margin-inline: auto;
+}
+
+.dor-home__hero {
+  text-align: center;
+}
+.dor-home__title {
+  margin: 0 0 var(--dor-space-2);
+  font-family: var(--dor-font-display);
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: var(--dor-ink);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.65);
+}
+.dor-home__subtitle {
+  margin: 0;
+  color: var(--dor-ink-soft);
+  font-size: 0.98rem;
+}
+
+/* --- نوار خلاصه‌ی وضعیت --- */
+.dor-home__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--dor-space-2);
+  margin: 0;
+  padding: var(--dor-space-3);
+  background: var(--dor-wood-plank);
+  border: 3px solid rgba(58, 31, 12, 0.5);
+  border-radius: var(--dor-radius-3);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.35),
+    0 6px 16px rgba(0, 0, 0, 0.3);
+}
+.dor-home__stat {
+  text-align: center;
+}
+.dor-home__stat dt {
+  font-size: 0.78rem;
+  color: #f0dcb4;
+  opacity: 0.85;
+  margin-block-end: 2px;
+}
+.dor-home__stat dd {
+  margin: 0;
+  font-family: var(--dor-font-display);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--dor-gold, #fbdc65);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* --- کارت‌های منو --- */
+.dor-home__menu {
+  display: grid;
+  gap: var(--dor-space-3);
+}
+.dor-home-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--dor-space-4);
+  min-block-size: var(--dor-touch-min);
+  padding: var(--dor-space-4);
+  text-decoration: none;
+  color: var(--dor-ink);
+  background: linear-gradient(180deg, var(--dor-surface) 0%, var(--dor-surface-2) 100%);
+  border: 2px solid var(--dor-border);
+  border-radius: var(--dor-radius-3);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.7),
+    0 4px 0 rgba(120, 85, 50, 0.45),
+    0 8px 16px rgba(0, 0, 0, 0.22);
+  transition:
+    transform var(--dor-duration-1) var(--dor-ease),
+    box-shadow var(--dor-duration-1) var(--dor-ease);
+}
+.dor-home-tile:active {
+  transform: translateY(3px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    0 1px 0 rgba(120, 85, 50, 0.45),
+    0 3px 8px rgba(0, 0, 0, 0.2);
+}
+.dor-home-tile--primary {
+  background: var(--dor-btn-orange);
+  border-color: var(--dor-btn-orange-edge);
+  color: var(--dor-btn-fg);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    0 5px 0 var(--dor-btn-orange-edge),
+    0 10px 20px rgba(0, 0, 0, 0.3);
+}
+.dor-home-tile--primary .dor-home-tile__desc {
+  color: rgba(255, 248, 236, 0.9);
+}
+.dor-home-tile__icon {
+  font-size: 2rem;
+  line-height: 1;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+}
+.dor-home-tile__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+.dor-home-tile__title {
+  font-family: var(--dor-font-display);
+  font-size: 1.12rem;
+  font-weight: 900;
+}
+.dor-home-tile__desc {
+  font-size: 0.85rem;
+  color: var(--dor-ink-soft);
+  line-height: 1.5;
+}
+.dor-home-tile__badge {
+  margin-inline-start: auto;
+  flex: 0 0 auto;
+  min-inline-size: 26px;
+  padding: 2px 8px;
+  text-align: center;
+  font-weight: 900;
+  font-size: 0.85rem;
+  color: var(--dor-on-gold);
+  background: var(--dor-gold-face);
+  border-radius: var(--dor-radius-round);
+  box-shadow: var(--dor-inset-gold);
+}
+
+/* ================================================================
+   صفحه‌ی مراحل
+   ================================================================ */
+.dor-levels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dor-space-5);
+  max-inline-size: 560px;
+  margin-inline: auto;
+}
+.dor-levels__hero {
+  text-align: center;
+}
+.dor-levels__title {
+  margin: 0 0 var(--dor-space-2);
+  font-family: var(--dor-font-display);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--dor-ink);
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.65);
+}
+.dor-levels__subtitle,
+.dor-levels__progress {
+  margin: 0;
+  color: var(--dor-ink-soft);
+  font-size: 0.92rem;
+}
+.dor-levels__progress {
+  margin-block-start: var(--dor-space-2);
+  font-weight: 800;
+  color: var(--dor-ink);
+}
+.dor-levels__bar {
+  margin-block-start: var(--dor-space-2);
+  block-size: 12px;
+  border-radius: var(--dor-radius-round);
+  background: rgba(58, 31, 12, 0.3);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+.dor-levels__bar > span {
+  display: block;
+  block-size: 100%;
+  background: var(--dor-btn-green);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35);
+  transition: inline-size var(--dor-duration-3) var(--dor-ease);
+}
+.dor-levels__alldone {
+  margin: 0;
+  padding: var(--dor-space-4);
+  text-align: center;
+  font-weight: 800;
+  color: var(--dor-on-gold);
+  background: var(--dor-gold-face);
+  border-radius: var(--dor-radius-3);
+  box-shadow: var(--dor-inset-gold), var(--dor-shadow-2);
+}
+
+.dor-levels__chapter {
+  padding: var(--dor-space-4);
+  background: var(--dor-wood-plank);
+  border: 3px solid rgba(58, 31, 12, 0.5);
+  border-radius: var(--dor-radius-3);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.35),
+    0 6px 16px rgba(0, 0, 0, 0.28);
+}
+.dor-levels__chapter[data-unlocked='false'] {
+  opacity: 0.72;
+}
+.dor-levels__chapter-title {
+  margin: 0 0 var(--dor-space-3);
+  font-family: var(--dor-font-display);
+  font-size: 1rem;
+  font-weight: 900;
+  text-align: center;
+  color: var(--dor-gold, #fbdc65);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+.dor-levels__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--dor-space-2);
+}
+
+.dor-level {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  aspect-ratio: 1;
+  min-block-size: var(--dor-touch-min);
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--dor-font-display);
+  border-radius: var(--dor-radius-2);
+  border: 2px solid transparent;
+  background: var(--dor-tile-empty-face);
+  color: var(--dor-on-tile-empty);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.6),
+    0 3px 0 rgba(0, 0, 0, 0.28),
+    0 5px 10px rgba(0, 0, 0, 0.25);
+  transition: transform var(--dor-duration-1) var(--dor-ease);
+}
+.dor-level:active:not(:disabled) {
+  transform: translateY(3px);
+}
+.dor-level__n {
+  font-size: 1.2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+.dor-level__mark {
+  font-size: 0.72rem;
+  line-height: 1;
+  opacity: 0.9;
+}
+.dor-level[data-state='done'] {
+  background: var(--dor-tile-correct-face);
+  color: var(--dor-on-correct);
+  border-color: transparent;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    0 3px 0 var(--dor-tile-correct-edge),
+    0 5px 10px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+}
+.dor-level[data-state='current'] {
+  background: var(--dor-btn-orange);
+  color: var(--dor-btn-fg);
+  border-color: var(--dor-gold, #fbdc65);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    0 3px 0 var(--dor-btn-orange-edge),
+    0 0 0 3px rgba(212, 160, 32, 0.4),
+    0 6px 14px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  animation: dor-level-pulse 2.4s var(--dor-ease) infinite;
+}
+@keyframes dor-level-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+.dor-level[data-state='locked'] {
+  background: var(--dor-tile-absent-face);
+  color: rgba(240, 220, 180, 0.55);
+  cursor: not-allowed;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    0 2px 0 var(--dor-tile-absent-edge);
+}
+
+.dor-levels__cta {
+  align-self: center;
+  min-inline-size: 220px;
+}
+.dor-levels__reset {
+  align-self: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--dor-ink-soft);
+  text-decoration: underline;
+  padding: var(--dor-space-2);
+}
+
+/* --- نوار بالای صفحه‌ی بازی یک مرحله --- */
+
+/*
+ * ⚠️ #level-play یک نوار سرصفحه (~۴۳px) اضافه می‌کند که در
+ * --dor-shell-chrome حساب نشده بود؛ نتیجه: ردیف سوم کیبورد (ثبت/⌫)
+ * زیر ناوبری پایین پنهان می‌شد. این‌جا خودِ صفحه‌ی مرحله ستون flex
+ * می‌شود و ارتفاع باقی‌مانده را به تخته‌ی بازی می‌دهد.
+ */
+#level-play {
+  display: flex;
+  flex-direction: column;
+  /*
+   * نوار سرصفحه‌ی مرحله (~۴۳px + فاصله) به کروم پوسته اضافه می‌شود تا
+   * برد بازی خودش را کوچک‌تر بگیرد و ردیف سوم کیبورد زیر ناوبری نرود.
+   */
+  --dor-shell-chrome: 253px;
+  block-size: calc(100dvh - 200px);
+  min-block-size: 0;
+}
+#level-play > #game-screen {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  max-block-size: none;
+  /* min-content کیبورد نباید صفحه را از عرض والد بیرون بزند */
+  inline-size: 100%;
+  min-inline-size: 0;
+  overflow: hidden;
+}
+
+.dor-level-play__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dor-space-3);
+  flex: 0 0 auto;
+  margin-block-end: var(--dor-space-2);
+}
+.dor-level-play__back {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  padding: var(--dor-space-2) var(--dor-space-4);
+  color: var(--dor-ink);
+  background: linear-gradient(180deg, var(--dor-surface) 0%, var(--dor-surface-2) 100%);
+  border: 2px solid var(--dor-border);
+  border-radius: var(--dor-radius-round);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.6), 0 3px 0 rgba(120, 85, 50, 0.4);
+}
+.dor-level-play__title {
+  font-family: var(--dor-font-display);
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--dor-ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.dor-loading {
+  text-align: center;
+  color: var(--dor-ink-soft);
+  padding: var(--dor-space-6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dor-level[data-state='current'] {
+    animation: none;
+  }
+}
+
+/* ================================================================
+   ارتفاع «کروم» پوسته (هدر + ناوبری) — برد بازی از آن برای
+   جاشدن در یک نمای گوشی استفاده می‌کند. بدون این، ردیف سوم کیبورد
+   زیر ناوبری پنهان می‌شد.
+   ================================================================ */
+:root {
+  --dor-shell-chrome: 200px;
+}
+
+/*
+ * صفحه‌ی بازی خودش padding و اسکرول را مدیریت می‌کند؛ padding اضافه‌ی
+ * outlet آن را از نما بیرون می‌راند. پس روی مسیرهای بازی حذفش می‌کنیم.
+ */
+#main-outlet:has(#game-screen) {
+  padding-inline: var(--dor-space-2);
+  padding-block: var(--dor-space-2);
+  padding-block-end: calc(var(--dor-space-2) + 84px);
+  /* روی مسیرهای بازی هرگز اسکرول لازم نیست؛ همه‌چیز در یک نما جا می‌شود */
+  overflow: hidden;
+}
+
+/* ================================================================
+   دکمه‌ی اصلی پوسته — «.dor-primary» کلاس ui-kit نیست (ui-kit از
+   .dor-btn--primary استفاده می‌کند)، پس این‌جا سبک گنبدی خودش را دارد.
+   بدون این، CTAها مثل دکمه‌ی خام مرورگر دیده می‌شدند.
+   ================================================================ */
+.dor-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dor-space-2);
+  min-block-size: var(--dor-touch-min);
+  padding: var(--dor-space-3) var(--dor-space-5);
+  cursor: pointer;
+  text-decoration: none;
+  font-family: var(--dor-font-display);
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--dor-btn-fg);
+  background: var(--dor-btn-orange);
+  border: 2px solid var(--dor-btn-orange-edge);
+  border-radius: var(--dor-radius-round);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    0 5px 0 var(--dor-btn-orange-edge),
+    0 9px 18px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  transition: transform var(--dor-duration-1) var(--dor-ease);
+}
+.dor-primary:active {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.35),
+    0 1px 0 var(--dor-btn-orange-edge),
+    0 3px 8px rgba(0, 0, 0, 0.25);
+}
+.dor-primary:focus-visible {
+  outline: none;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    0 5px 0 var(--dor-btn-orange-edge),
+    var(--dor-focus-ring);
 }

@@ -4,14 +4,56 @@
  * → پیروزی → کارت فرهنگی → «فردا معمای واقعی منتظرته!».
  * مبنا: Bandura 1977 (خودکارآمدی) + Kahneman 1993 (Peak-End). خط قرمز ۱۷.
  */
-import { useMemo, useState } from 'preact/hooks';
-import type { JSX } from 'preact';
+import { useEffect, useMemo, useState } from 'preact/hooks';
+import type { ComponentType, JSX } from 'preact';
 import type { CultureCard } from '@dordaneh/contracts';
 import { t } from '../core/i18n';
 import { useShell } from './context';
-import { MockGameScreen } from '../mocks/screens.mock';
+import { loadGameScreen } from './screens';
 
 type Stage = 'intro' | 'play' | 'win';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- کامپوننت خارجی پکیج مالک
+type AnyComponent = ComponentType<any>;
+
+/**
+ * معمای آنبوردینگ با **GameScreen واقعی** (AI-06) و موتور واقعی (AI-01).
+ *
+ * ⚠️ قبلاً اینجا `MockGameScreen` مستقیماً import می‌شد؛ یعنی کاربر در اولین
+ * تجربه‌ی خود «نسخه‌ی قراردادی موقت» را می‌دید. حالا صفحه‌ی واقعی lazy لود
+ * می‌شود و سرویس‌های واقعی به آن تزریق می‌شوند.
+ */
+function OnboardingGame(props: { onFinished: (won: boolean) => void }): JSX.Element {
+  const { services, bus } = useShell();
+  const [Screen, setScreen] = useState<AnyComponent | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    void loadGameScreen().then((c) => {
+      if (alive) setScreen(() => c);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  if (!Screen) {
+    return (
+      <p class="dor-loading" id="onboarding-loading">
+        {t('appShell.loading')}
+      </p>
+    );
+  }
+  return (
+    <Screen
+      mode="practice"
+      engine={services.engine}
+      audio={services.audio}
+      bus={bus}
+      onFinished={props.onFinished}
+    />
+  );
+}
 
 export function Onboarding(props: { onDone: () => void }): JSX.Element {
   const { services, orchestrator, bus } = useShell();
@@ -52,13 +94,13 @@ export function Onboarding(props: { onDone: () => void }): JSX.Element {
         {/* ۲ راهنمای tooltip یک‌جمله‌ای درون‌بازی */}
         <aside class="dor-tooltip" id="onboarding-tip-1">{t('appShell.onboarding.tip1')}</aside>
         <aside class="dor-tooltip" id="onboarding-tip-2">{t('appShell.onboarding.tip2')}</aside>
-        <MockGameScreen puzzleIdOverride={puzzle.puzzleId} onFinished={handleFinished} />
+        <OnboardingGame onFinished={handleFinished} />
       </section>
     );
   }
 
   return (
-    <section id="onboarding-win" class="dor-screen dor-onboarding">
+    <section id="onboarding-win" class="dor-screen dor-onboarding" data-onboarding-win>
       <h1>{t('appShell.onboarding.win.title')}</h1>
       <p>{t('appShell.onboarding.win.body')}</p>
       {card ? (
