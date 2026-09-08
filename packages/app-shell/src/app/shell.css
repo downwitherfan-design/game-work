@@ -250,7 +250,7 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: var(--dor-space-5);
-  padding-block: var(--dor-space-4) var(--dor-space-6);
+  padding-block: var(--dor-space-3) var(--dor-space-6);
   text-align: center;
   position: relative;
   align-items: center;
@@ -260,12 +260,15 @@ body::before {
 .dor-onboarding::before {
   content: '';
   display: block;
-  width: 240px;
-  height: 240px;
+  width: 220px;
+  height: 220px;
   background: url('/assets/img/mascot-dordaneh.png') center / contain no-repeat;
-  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.6));
+  filter:
+    drop-shadow(0 12px 32px rgba(0, 0, 0, 0.7))
+    drop-shadow(0 0 24px rgba(212, 160, 32, 0.35));
   animation: mascot-bob 3.2s ease-in-out infinite;
-  margin-block-end: var(--dor-space-2);
+  margin-block-end: var(--dor-space-3);
+  flex-shrink: 0;
 }
 @keyframes mascot-bob {
   0%, 100% { transform: translateY(0) rotate(-1deg); }
@@ -274,34 +277,37 @@ body::before {
 
 .dor-onboarding h1 {
   font-family: var(--dor-font-display);
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 900;
   margin: 0;
   color: #fff8ec;
   text-shadow:
-    0 2px 0 rgba(139, 32, 16, 0.9),
-    0 3px 0 rgba(88, 20, 8, 0.7),
-    0 6px 16px rgba(0, 0, 0, 0.6);
+    0 2px 0 rgba(139, 32, 16, 0.95),
+    0 3px 0 rgba(88, 20, 8, 0.85),
+    0 4px 0 rgba(58, 12, 4, 0.65),
+    0 8px 20px rgba(0, 0, 0, 0.75);
   padding-inline: var(--dor-space-3);
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .dor-onboarding p {
-  font-size: 1.15rem;
-  line-height: 1.75;
+  font-size: 1.1rem;
+  line-height: 1.85;
   color: #fff8ec;
   margin: 0 auto;
   max-inline-size: 92%;
-  padding: var(--dor-space-4);
-  background: rgba(58, 36, 22, 0.78);
-  border-radius: 20px;
-  border: 2px solid rgba(255, 215, 100, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+  padding: var(--dor-space-4) var(--dor-space-5);
+  background:
+    linear-gradient(180deg, rgba(58, 36, 22, 0.88) 0%, rgba(28, 16, 8, 0.92) 100%);
+  border-radius: 22px;
+  border: 2px solid rgba(255, 215, 100, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    0 10px 30px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* دکمه‌ی primary — گنبدی نارنجی درشت (سبک آمیرزا) */
