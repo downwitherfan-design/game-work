@@ -651,3 +651,40 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   .dor-onboarding::before { animation: none; }
 }
+
+/* ================================================================
+   Game screen fallback: legend + placeholder polish
+   — متن‌های کوتاه کنار emoji کاشی در توضیحات راهنما
+   =============================================================== */
+.dor-screen p {
+  color: #fff8ec;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.7;
+  text-align: center;
+  padding: var(--dor-space-2) var(--dor-space-3);
+  margin: var(--dor-space-1) auto;
+  max-inline-size: 92%;
+  background: linear-gradient(180deg, rgba(58, 36, 22, 0.75) 0%, rgba(28, 16, 8, 0.85) 100%);
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 215, 100, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+/* این افکت فقط در game-screen و توضیحات: onboarding پاراگراف خودش استایل داره */
+.dor-onboarding p { background: linear-gradient(180deg, rgba(58, 36, 22, 0.88) 0%, rgba(28, 16, 8, 0.92) 100%) !important; border-radius: 22px !important; }
+
+/* راهنمای رنگ در بالای بازی — اموجی کاشی کوچک */
+.dor-screen p:has(> br) {
+  padding: var(--dor-space-3);
+  border-radius: 20px;
+}
+
+/* جدول nav placeholder وقتی bottom nav رندر نمی‌شه */
+#main-outlet:not(:has(.dor-screen)) {
+  padding-block-end: var(--dor-space-4);
+}
