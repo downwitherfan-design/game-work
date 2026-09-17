@@ -113,7 +113,7 @@ body::before {
   display: inline-block;
   inline-size: 46px;
   block-size: 46px;
-  background: url('/assets/img/logo-pearl.png') center / contain no-repeat;
+  background: url('/assets/img/logo-clean.png') center / contain no-repeat;
   filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.5));
 }
 
@@ -813,12 +813,12 @@ html::before {
 html::after {
   content: '';
   position: fixed;
-  inset-block-start: 12px;
-  inset-inline-end: calc(50% + 60px);
+  inset-block-start: 8px;
+  inset-inline-end: calc(50% + 72px);
   z-index: 101;
-  width: 44px;
-  height: 44px;
-  background: url('/assets/img/logo-pearl.png') center / contain no-repeat;
+  width: 52px;
+  height: 52px;
+  background: url('/assets/img/logo-clean.png') center / contain no-repeat;
   filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.55));
   pointer-events: none;
   animation: logo-pulse 3s ease-in-out infinite;
@@ -859,26 +859,49 @@ body {
 }
 
 /* متن وفادار در فوتر (ایکون‌ها و لیبل‌ها) — یک لایه‌ی pseudo دیگر */
+/* ‏── آیکون‌های ناوبری و لیبل‌ها در فوتر ── */
 #app::after {
-  content: '🎯 روزانه    📚 گنجینه    📊 آمار    ⚙️ تنظیمات';
+  content: '';
   position: fixed;
   inset-block-end: 0;
   inset-inline: 0;
   z-index: 101;
   height: 82px;
+  display: block;
+  padding-block-end: env(safe-area-inset-bottom, 0px);
+  pointer-events: none;
+  background:
+    /* icon 0 (روزانه — راست‌ترین در RTL) */
+    url('/assets/img/nav-icon-0.png') 92% 40% / 42px 42px no-repeat,
+    /* icon 1 (گنجینه) */
+    url('/assets/img/nav-icon-1.png') 67% 40% / 42px 42px no-repeat,
+    /* icon 2 (آمار) */
+    url('/assets/img/nav-icon-2.png') 33% 40% / 42px 42px no-repeat,
+    /* icon 3 (تنظیمات) */
+    url('/assets/img/nav-icon-3.png') 8% 40% / 42px 42px no-repeat;
+}
+
+/* ‏── لیبل‌های فارسی زیر آیکون‌ها ── */
+#app::before {
+  content: 'روزانه     گنجینه     آمار     تنظیمات';
+  position: fixed;
+  inset-block-end: 4px;
+  inset-inline: 0;
+  z-index: 102;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding-inline: var(--dor-space-3);
+  padding-inline: var(--dor-space-2);
   padding-block-end: env(safe-area-inset-bottom, 0px);
   font-family: var(--dor-font);
-  font-size: 0.85rem;
+  font-size: 0.72rem;
   font-weight: 800;
   color: #fbdc9a;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   text-shadow:
-    0 1px 0 rgba(0, 0, 0, 0.7),
-    0 2px 6px rgba(0, 0, 0, 0.5);
+    0 1px 0 rgba(0, 0, 0, 0.75),
+    0 2px 4px rgba(0, 0, 0, 0.5);
   pointer-events: none;
   white-space: pre;
   direction: rtl;
