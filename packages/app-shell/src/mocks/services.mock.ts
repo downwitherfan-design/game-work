@@ -61,8 +61,21 @@ export function createMockCulture(storage: StorageApi): CultureApi {
       return MOCK_CARDS[idx] as CultureCard;
     },
     getAlbum() {
-      const discovered = storage.get<string[]>(STORAGE_KEYS.album) ?? [];
-      const cards = MOCK_CARDS.filter((c) => discovered.includes(c.id));
+      /*
+       * ⚠️ کلید `dor.album` شکل رسمی `AlbumState { discovered: Record<id,…> }`
+       * دارد (مالک: meta-retention). این‌جا `string[]` فرض می‌شد و در اپ
+       * واقعی `e.includes is not a function` پرتاب می‌کرد و صفحه‌ی گنجینه
+       * می‌شکست. هر دو شکل (جدید + آرایه‌ی قدیمی) پشتیبانی می‌شود.
+       */
+      const raw: unknown = storage.get(STORAGE_KEYS.album);
+      let ids: string[] = [];
+      if (Array.isArray(raw)) {
+        ids = raw.filter((x): x is string => typeof x === 'string');
+      } else if (raw !== null && typeof raw === 'object') {
+        const d = (raw as { discovered?: Record<string, unknown> }).discovered;
+        if (d !== null && typeof d === 'object') ids = Object.keys(d);
+      }
+      const cards = MOCK_CARDS.filter((c) => ids.includes(c.id));
       return { total: MOCK_CARDS.length, cards };
     },
   };

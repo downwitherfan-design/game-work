@@ -54,6 +54,49 @@ function puzzleNumberFromId(puzzleId: string): number {
   return m ? Number(m[1]) : 0;
 }
 
+/**
+ * شکل ذخیره‌سازی آلبوم — همان قراردادی که meta-retention مالکش است.
+ * این‌جا تکرار شده (نه import) تا پوسته به تایپ‌های داخلی پکیج دیگر گره
+ * نخورد؛ کلید مشترک `dor.album` است و شکل باید دقیقاً یکی باشد.
+ */
+interface ShellAlbumState {
+  discovered: Record<string, { puzzleNumber: number; golden?: boolean }>;
+  endowedGranted: boolean;
+  review: Record<string, unknown>;
+}
+
+/**
+ * خواندن مقاوم آلبوم.
+ *
+ * ⚠️ نسخه‌های قدیمی اپ آلبوم را به شکل `string[]` ذخیره می‌کردند. اگر
+ * کاربر از آن نسخه ارتقا دهد، داده‌ی قدیمی باید مهاجرت کند وگرنه
+ * صفحه‌ی گنجینه خالی می‌شود یا می‌شکند.
+ */
+function readAlbumState(storage: ShellStorage): ShellAlbumState {
+  const raw: unknown = storage.get(STORAGE_KEYS.album);
+
+  // مهاجرت از فرمت آرایه‌ای قدیمی
+  if (Array.isArray(raw)) {
+    const discovered: ShellAlbumState['discovered'] = {};
+    for (const id of raw) {
+      if (typeof id === 'string') discovered[id] = { puzzleNumber: 0 };
+    }
+    return { discovered, endowedGranted: false, review: {} };
+  }
+
+  if (raw !== null && typeof raw === 'object') {
+    const o = raw as Partial<ShellAlbumState>;
+    return {
+      discovered:
+        o.discovered !== null && typeof o.discovered === 'object' ? { ...o.discovered } : {},
+      endowedGranted: o.endowedGranted === true,
+      review: o.review !== null && typeof o.review === 'object' ? { ...o.review } : {},
+    };
+  }
+
+  return { discovered: {}, endowedGranted: false, review: {} };
+}
+
 export function createOrchestrator(
   bus: EventBus,
   services: ShellServices,
@@ -106,10 +149,19 @@ export function createOrchestrator(
         const card = services.culture.getCardForPuzzle(puzzleNumberFromId(e.puzzleId), solution);
         steps.push({ step: 'culture_card', card });
 
-        // آلبوم: ثبت کشف + بج زایگارنیک
-        const album = storage.get<string[]>(STORAGE_KEYS.album) ?? [];
-        if (!album.includes(card.id)) {
-          album.push(card.id);
+        /*
+         * آلبوم: ثبت کشف + بج زایگارنیک.
+         *
+         * ⚠️ باگ P0 که این‌جا رفع شد: پوسته آلبوم را به شکل `string[]`
+         * می‌نوشت، در حالی که مالک واقعی کلید `dor.album`
+         * (meta-retention) شکل `AlbumState { discovered, endowedGranted,
+         * review }` را می‌خواند و می‌نویسد. نتیجه: کارت‌های کشف‌شده در
+         * صفحه‌ی گنجینه **هرگز دیده نمی‌شدند** و دو فرمت ناسازگار روی یک
+         * کلید می‌جنگیدند. حالا پوسته همان فرمت رسمی را می‌نویسد.
+         */
+        const album = readAlbumState(storage);
+        if (!(card.id in album.discovered)) {
+          album.discovered[card.id] = { puzzleNumber: puzzleNumberFromId(e.puzzleId) };
           storage.set(STORAGE_KEYS.album, album);
           storage.set(SHELL_KEYS.albumBadge, true);
         }

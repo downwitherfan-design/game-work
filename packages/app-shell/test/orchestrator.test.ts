@@ -32,6 +32,17 @@ function practiceAnswer(services: ShellServices, seed: number, difficulty: numbe
   return services.wordDb.getPracticeAnswer(seed, difficulty).word;
 }
 
+/**
+ * کارت‌های کشف‌شده از کلید مشترک `dor.album`.
+ * شکل رسمی `AlbumState` است (مالک: meta-retention) — پوسته هم همان را
+ * می‌نویسد. قبلاً پوسته `string[]` می‌نوشت و صفحه‌ی گنجینه هیچ کارتی
+ * نمی‌دید؛ این helper تست را به شکل درست گره می‌زند.
+ */
+function albumDiscovered(storage: ShellStorage): Record<string, unknown> {
+  const a = storage.get<{ discovered?: Record<string, unknown> }>(STORAGE_KEYS.album);
+  return a?.discovered ?? {};
+}
+
 describe('getBus — singleton', () => {
   beforeEach(() => resetBusForTests());
   it('یک نمونه‌ی واحد برمی‌گرداند', () => {
@@ -108,7 +119,8 @@ describe('Orchestrator — جریان پس از حل', () => {
     expect(stepsSeen[0]).toEqual(['culture_card', 'streak_update', 'share_prompt']);
     expect(revealed).toHaveLength(1);
     expect(orch.hasAlbumBadge()).toBe(true);
-    expect(storage.get<string[]>(STORAGE_KEYS.album)).toHaveLength(1);
+    // آلبوم شکل رسمی AlbumState دارد (کلید مشترک با meta-retention)، نه string[]
+    expect(Object.keys(albumDiscovered(storage))).toHaveLength(1);
   });
 
   it('باخت: بدون کارت، فقط streak و share', () => {
@@ -127,7 +139,7 @@ describe('Orchestrator — جریان پس از حل', () => {
     bus.emit({ type: 'puzzle_finished', puzzleId, won: true, guessCount: 1, durationMs: 1 });
     orch.clearAlbumBadge();
     bus.emit({ type: 'puzzle_finished', puzzleId, won: true, guessCount: 1, durationMs: 1 });
-    expect(storage.get<string[]>(STORAGE_KEYS.album)).toHaveLength(1);
+    expect(Object.keys(albumDiscovered(storage))).toHaveLength(1);
     expect(orch.hasAlbumBadge()).toBe(false);
   });
 

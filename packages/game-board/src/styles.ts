@@ -59,32 +59,27 @@ export const GAME_BOARD_CSS = `
 .gb-board {
   display: grid;
   /*
-   * ⚠️ «اندازه‌ی خانه» تنها منبع حقیقتِ چیدمان برد است. هم عرض و هم ارتفاع
-   * از آن می‌آیند، پس:
-   *   ۱) کاشی‌ها همیشه مربع‌اند (بدون aspect-ratio و بدون کشیدگی)
-   *   ۲) ردیف آخر هرگز بریده نمی‌شود، چون ارتفاع برد ≤ فضای باقی‌مانده است
-   *   ۳) تخته دور کلمه‌ی ۵ حرفی باریک می‌شود، نه اینکه خانه‌ها پهن شوند
-   * --dor-shell-chrome را پوسته ست می‌کند (هدر + ناوبری + نوار مرحله)،
-   * --gb-outside تقریبِ ارتفاعِ چیزهای غیرِبرد است (سربرگ + پیشرفت + کیبورد).
+   * ⚠️ چیدمان برد — بدون هیچ «تخمین ارتفاع».
+   *
+   * نسخه‌ی قبلی یک ثابت (--gb-outside) برای ارتفاع اجزای غیرِبرد داشت. آن
+   * ثابت شکننده بود: در /practice که انتخابگر دشواری ۸۲px اضافه می‌کند،
+   * تخمین اشتباه می‌شد و کیبورد زیر ناوبری می‌رفت (باگی که گِیت «اپ واقعی»
+   * گرفت). حالا:
+   *   • ارتفاع برد = هرچه از فضای flex باقی مانده (flex: 1 1 auto)
+   *   • مربع‌بودن خانه‌ها = aspect-ratio روی خودِ تخته
+   *   • عرض برد = هرگز از فضای موجود بیشتر نمی‌شود
+   * بنابراین برد هرچه لازم باشد کوچک می‌شود و کیبورد هرگز فشرده نمی‌شود.
+   *
+   * aspect-ratio نسبت ستون/ردیف را می‌سازد (۵ حرفی → باریک‌تر از ۶ حرفی).
    */
-  --gb-outside: 390px;
-  --gb-cell: clamp(
-    26px,
-    min(
-      12.5vw,
-      calc(
-        (100dvh - var(--dor-shell-chrome, 190px) - var(--gb-outside)) /
-          var(--gb-rows, 6)
-      )
-    ),
-    58px
-  );
-  grid-template-rows: repeat(var(--gb-rows, 6), var(--gb-cell));
+  grid-template-rows: repeat(var(--gb-rows, 6), 1fr);
   gap: 6px;
-  inline-size: fit-content;
-  max-inline-size: 100%;
+  aspect-ratio: var(--gb-len, 6) / var(--gb-rows, 6);
+  block-size: auto;
+  inline-size: auto;
+  max-inline-size: min(100%, 400px);
   margin-inline: auto;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-block-size: 0;
   padding: var(--dor-space-3);
   /* تخته‌ی چوبی تیره — بدون آن کاشی‌های کِرِمی روی پس‌زمینه‌ی گرمِ صحنه
@@ -99,12 +94,10 @@ export const GAME_BOARD_CSS = `
 }
 .gb-row {
   display: grid;
-  /* ستون‌ها هم‌اندازه‌ی خانه‌اند → کاشیِ مربع تضمین‌شده */
-  grid-template-columns: repeat(var(--gb-len, 6), var(--gb-cell, 52px));
+  grid-template-columns: repeat(var(--gb-len, 6), 1fr);
   gap: 6px;
   direction: rtl;
   min-block-size: 0;
-  justify-content: center;
 }
 
 /*
@@ -121,10 +114,18 @@ export const GAME_BOARD_CSS = `
   min-block-size: 0;
   aspect-ratio: auto;
 }
-/* اندازه‌ی حرف با خانه هم‌مقیاس می‌شود (نه با vw، تا در مرحله هم درست بماند) */
+/*
+ * اندازه‌ی حرف با خانه هم‌مقیاس می‌شود. cqmin واحد container query است و
+ * دقیقاً به اندازه‌ی خانه‌ی گرید گره می‌خورد — پس در /practice (که تخته
+ * کوچک‌تر می‌شود) و در /levels هم درست می‌ماند، بدون هیچ عدد ثابت.
+ */
+.gb-row > .dor-tile,
+.gb-row > .gb-tile {
+  container-type: size;
+}
 .gb-row > .dor-tile .dor-tile__face,
 .gb-row > .gb-tile {
-  font-size: calc(var(--gb-cell, 52px) * 0.56);
+  font-size: clamp(0.85rem, 58cqmin, 1.9rem);
 }
 
 /* لرزش حدس نامعتبر */

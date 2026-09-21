@@ -52,12 +52,23 @@ export function Home(): JSX.Element {
   const summary = useMemo(() => {
     const streak = storage.get<{ current?: number }>(STORAGE_KEYS.streak);
     const stats = storage.get<{ gamesPlayed?: number }>(STORAGE_KEYS.stats);
-    const album = storage.get<string[]>(STORAGE_KEYS.album);
+    /*
+     * ⚠️ آلبوم شکل `AlbumState { discovered: Record<id, …> }` دارد (مالک:
+     * meta-retention). قبلاً این‌جا `string[]` فرض می‌شد و شمارنده‌ی
+     * «کارت‌ها» همیشه صفر می‌ماند. هر دو شکل پشتیبانی می‌شود تا نصب‌های
+     * قدیمی هم درست شمرده شوند.
+     */
+    const album = storage.get<unknown>(STORAGE_KEYS.album);
+    const cardCount = Array.isArray(album)
+      ? album.length
+      : album !== null && typeof album === 'object'
+        ? Object.keys((album as { discovered?: Record<string, unknown> }).discovered ?? {}).length
+        : 0;
     const levels = readProgress(storage);
     return {
       streak: typeof streak?.current === 'number' ? streak.current : 0,
       played: typeof stats?.gamesPlayed === 'number' ? stats.gamesPlayed : 0,
-      cards: Array.isArray(album) ? album.length : 0,
+      cards: cardCount,
       levelsCleared: levels.cleared,
     };
   }, [storage]);

@@ -51,6 +51,32 @@ function GameRoute(props: { mode: 'daily' | 'practice' | 'duel'; duelSeed?: numb
   );
 }
 
+/**
+ * تزریق سرویس‌های واقعی به صفحه‌های AI-08 (آمار و گنجینه).
+ *
+ * ⚠️ همان باگ GameRoute این‌جا هم بود: `<Route component={StatsScreen} />`
+ * هیچ prop نمی‌گرفت، پس `props.meta.getStats()` روی `undefined` صدا زده
+ * می‌شد و صفحه با TypeError سفید می‌شد. گِیت «اپ واقعی» این را گرفت.
+ */
+function StatsRoute(): JSX.Element {
+  const { services, bus } = useShell();
+  /*
+   * ⚠️ prop `t` را پاس نمی‌دهیم: مترجم پوسته کلیدهای metaRetention.* را
+   * ندارد و صفحه کلیدهای خام («metaRetention.stats.title») نشان می‌داد.
+   * هر پکیج locale خودش را دارد و پیش‌فرضِ خودش درست است.
+   */
+  return <StatsScreen meta={services.meta} bus={bus} />;
+}
+
+function AlbumRoute(): JSX.Element {
+  const { services, bus, orchestrator } = useShell();
+  // ورود به گنجینه، نشان «تازه» را پاک می‌کند
+  useEffect(() => {
+    orchestrator.clearAlbumBadge();
+  }, [orchestrator]);
+  return <AlbumScreen meta={services.meta} culture={services.culture} bus={bus} />;
+}
+
 function NavLink(props: {
   href: string;
   id: string;
@@ -201,8 +227,8 @@ export function App(): JSX.Element {
             <Route path="/daily" component={() => <GameRoute mode="daily" />} />
             <Route path="/levels" component={LevelsScreen} />
             <Route path="/practice" component={() => <GameRoute mode="practice" />} />
-            <Route path="/stats" component={StatsScreen} />
-            <Route path="/album" component={AlbumScreen} />
+            <Route path="/stats" component={StatsRoute} />
+            <Route path="/album" component={AlbumRoute} />
             <Route path="/duel/*" component={DuelScreen} />
             <Route path="/shop" component={ShopScreen} />
             <Route path="/settings" component={SettingsScreen} />

@@ -22,6 +22,7 @@ import * as audioHaptics from '@dordaneh/audio-haptics';
 import * as analyticsPkg from '@dordaneh/analytics';
 import * as monetizationPkg from '@dordaneh/monetization';
 import * as viralShare from '@dordaneh/viral-share';
+import { createMetaRetention, type MetaRetentionApi } from '@dordaneh/meta-retention';
 import { createMockEngine } from '../mocks/engine.mock';
 import { createMockWordDb } from '../mocks/word-db.mock';
 import {
@@ -42,6 +43,12 @@ export interface ShellServices {
   analytics: AnalyticsApi;
   monetization: MonetizationApi;
   share: ShareApi;
+  /**
+   * استریک/آمار/گنجینه (AI-08).
+   * ⚠️ قبلاً ساخته نمی‌شد و صفحه‌های /stats و /album با خطای
+   * «Cannot read properties of undefined (reading 'getStats')» می‌شکستند.
+   */
+  meta: MetaRetentionApi;
   /** برای دیباگ/تست: کدام سرویس‌ها mock هستند */
   mockFlags: Record<string, boolean>;
 }
@@ -177,6 +184,13 @@ export function createServices(bus: EventBus, storage: ShellStorage): ShellServi
       storage,
     ) ?? null;
 
+  // سرویس متا مستقیماً از factory قراردادی AI-08 ساخته می‌شود (بدون pick/mock)
+  const meta = createMetaRetention({
+    bus,
+    storage,
+    monetization: monetization as never,
+  });
+
   return {
     engine: engine ?? createMockEngine(),
     wordDb,
@@ -185,6 +199,7 @@ export function createServices(bus: EventBus, storage: ShellStorage): ShellServi
     analytics: analytics ?? createMockAnalytics(storage),
     monetization: monetization ?? createMockMonetization(storage),
     share: share ?? createMockShare(),
+    meta,
     mockFlags: {
       engine: engine === null,
       wordDb: wordDbIsMock,

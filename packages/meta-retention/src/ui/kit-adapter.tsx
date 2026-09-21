@@ -118,17 +118,19 @@ export function Button(props: ButtonProps): VNode {
 
 /** استایل مشترک Screen ها — یک‌بار تزریق می‌شود (توکن‌ها فقط var قراردادی) */
 export const SHARED_CSS = `
-.mr-screen{direction:rtl;font-family:var(--dor-font);padding:var(--dor-space-3);max-width:520px;margin-inline:auto;color:inherit}
-.mr-screen h1{font-size:1.3rem;margin:0 0 var(--dor-space-3)}
-.mr-screen h2{font-size:1.05rem;margin:var(--dor-space-4) 0 var(--dor-space-2)}
-.mr-card{background:var(--dor-bg);border-radius:var(--dor-radius);padding:var(--dor-space-3);box-shadow:0 1px 4px rgba(0,0,0,.08)}
-[data-theme="dark"] .mr-card{background:var(--dor-dark-bg)}
+.mr-screen{direction:rtl;font-family:var(--dor-font);padding:0;max-width:520px;margin-inline:auto;color:var(--dor-ink)}
+.mr-screen h1{font-family:var(--dor-font-display,var(--dor-font));font-size:1.35rem;font-weight:900;margin:0 0 var(--dor-space-3);color:var(--dor-ink);text-shadow:0 1px 0 rgba(255,255,255,.55)}
+.mr-screen h2{font-family:var(--dor-font-display,var(--dor-font));font-size:1.08rem;font-weight:900;margin:var(--dor-space-4) 0 var(--dor-space-2);color:var(--dor-ink);text-shadow:0 1px 0 rgba(255,255,255,.5)}
+/* ⚠️ کارت باید از --dor-surface بیاید، نه --dor-bg. با --dor-bg رنگ کارت
+   *دقیقاً* همان رنگ پس‌زمینه‌ی صحنه می‌شد و کارت‌ها نامرئی می‌شدند (صفحه‌ی
+   آمار «سفید خالی» به نظر می‌رسید). --dor-surface دقیقاً برای همین هست و
+   در هر دو تم مقدار درست دارد، پس override تم تیره هم لازم نیست. */
+.mr-card{background:var(--dor-surface);border:2px solid var(--dor-border);border-radius:var(--dor-radius-3,var(--dor-radius));padding:var(--dor-space-3);box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 3px 0 rgba(120,85,50,.22),0 6px 14px rgba(60,30,10,.14)}
 .mr-btn{font-family:var(--dor-font);border:none;border-radius:var(--dor-radius);padding:var(--dor-space-2) var(--dor-space-3);font-size:1rem;cursor:pointer;transition:transform .08s ease}
 .mr-btn:active{transform:scale(.97)}
 .mr-btn--primary{background:var(--dor-accent);color:var(--dor-bg)}
 .mr-btn--ghost{background:transparent;color:var(--dor-accent);border:1px solid var(--dor-accent)}
 .mr-btn--gold{background:var(--dor-gold);color:var(--dor-dark-bg)}
 .mr-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:var(--dor-space-3)}
-.mr-modal{background:var(--dor-bg);border-radius:var(--dor-radius);padding:var(--dor-space-4);max-width:420px;width:100%;max-height:85vh;overflow-y:auto;direction:rtl;font-family:var(--dor-font)}
-[data-theme="dark"] .mr-modal{background:var(--dor-dark-bg)}
+.mr-modal{background:var(--dor-surface);border:2px solid var(--dor-border);border-radius:var(--dor-radius-3,var(--dor-radius));padding:var(--dor-space-4);max-width:420px;width:100%;max-height:85vh;overflow-y:auto;direction:rtl;font-family:var(--dor-font);box-shadow:0 12px 32px rgba(0,0,0,.4)}
 `;
